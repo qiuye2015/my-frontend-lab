@@ -1,1605 +1,1200 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>终极程序员导航</title>
     <style>
-      /*
+        /*
          * CSS变量定义 - 类似于后端的配置文件
          * 定义全局样式变量，便于主题切换和统一管理
          */
-      :root {
-        --primary-color: #2196f3; /* 主色调 */
-        --bg-color: #ffffff; /* 背景色 */
-        --text-color: #333333; /* 文字颜色 */
-        --border-color: #e0e0e0; /* 边框颜色 */
-        --card-bg: #ffffff; /* 卡片背景色 */
-        --shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-        --transition: all 0.3s ease; /* 过渡动画时间 */
-      }
+        :root {
+            --primary-color: #2196F3;     /* 主色调 */
+            --bg-color: #ffffff;          /* 背景色 */
+            --text-color: #333333;        /* 文字颜色 */
+            --border-color: #e0e0e0;      /* 边框颜色 */
+            --card-bg: #ffffff;           /* 卡片背景色 */
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);  /* 阴影效果 */
+            --transition: all 0.3s ease; /* 过渡动画时间 */
+        }
 
-      /*
+        /*
          * 全局重置样式 - 消除浏览器默认样式差异
          * 类似于后端的基础配置，确保所有元素从零开始
          */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box; /* 盒模型：边框和内边距包含在宽高内 */
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;  /* 盒模型：边框和内边距包含在宽高内 */
+        }
 
-      /*
+        /*
          * 页面主体样式
          * 设置全局字体、行高、背景等基础样式
          */
-      body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        line-height: 1.6; /* 行高1.6倍，提高可读性 */
-        background: var(--bg-color); /* 使用CSS变量设置背景 */
-        color: var(--text-color); /* 使用CSS变量设置文字颜色 */
-        transition: var(--transition); /* 主题切换时的过渡效果 */
-        overflow-x: hidden; /* 隐藏水平滚动条 */
-      }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;                    /* 行高1.6倍，提高可读性 */
+            background: var(--bg-color);         /* 使用CSS变量设置背景 */
+            color: var(--text-color);            /* 使用CSS变量设置文字颜色 */
+            transition: var(--transition);       /* 主题切换时的过渡效果 */
+            overflow-x: hidden;                  /* 隐藏水平滚动条 */
+        }
 
-      /*
+        /*
          * 容器样式 - 类似于后端的布局容器
          * 限制最大宽度，居中显示，添加左右内边距
          */
-      .container {
-        max-width: 1200px; /* 最大宽度1200px */
-        margin: 0 auto; /* 水平居中 */
-        padding: 0 20px; /* 左右内边距20px */
-      }
+        .container {
+            max-width: 1200px;  /* 最大宽度1200px */
+            margin: 0 auto;     /* 水平居中 */
+            padding: 0 20px;    /* 左右内边距20px */
+        }
 
-      /*
+        /*
          * Matrix背景画布 - 特效背景
          * 固定定位在页面背景，默认透明，Matrix主题时显示
          */
-      #matrix-canvas {
-        position: fixed; /* 固定定位，不随页面滚动 */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1; /* 层级-1，在所有内容后面 */
-        opacity: 0; /* 默认透明 */
-        transition: opacity 0.5s ease; /* 透明度过渡效果 */
-      }
+        #matrix-canvas {
+            position: fixed;     /* 固定定位，不随页面滚动 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;         /* 层级-1，在所有内容后面 */
+            opacity: 0;          /* 默认透明 */
+            transition: opacity 0.5s ease;  /* 透明度过渡效果 */
+        }
 
-      /*
+        /*
          * 头部导航栏样式
          * sticky定位：滚动时固定在顶部
          */
-      .header {
-        padding: 20px 0;
-        border-bottom: 1px solid var(--border-color);
-        position: sticky; /* 粘性定位，滚动时固定在顶部 */
-        top: 0;
-        z-index: 100; /* 高层级，确保在其他内容上方 */
-        background: var(--card-bg);
-        backdrop-filter: blur(10px); /* 背景模糊效果 */
-      }
+        .header {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;    /* 粘性定位，滚动时固定在顶部 */
+            top: 0;
+            z-index: 100;        /* 高层级，确保在其他内容上方 */
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);  /* 背景模糊效果 */
+        }
 
-      /*
+        /*
          * 头部容器布局 - 使用Flexbox布局
          * 左右分布：左侧Logo，右侧控制按钮
          */
-      .header .container {
-        display: flex;
-        justify-content: space-between; /* 两端对齐 */
-        align-items: center; /* 垂直居中 */
-        flex-wrap: wrap; /* 允许换行，响应式布局 */
-        gap: 15px; /* 元素间距15px */
-      }
+        .header .container {
+            display: flex;
+            justify-content: space-between;  /* 两端对齐 */
+            align-items: center;             /* 垂直居中 */
+            flex-wrap: wrap;                 /* 允许换行，响应式布局 */
+            gap: 15px;                       /* 元素间距15px */
+        }
 
-      /*
+        /*
          * Logo样式
          */
-      .logo {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: var(--primary-color);
-        transition: var(--transition);
-      }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
 
-      /*
+        /*
          * 头部控制区域 - 包含搜索框和主题切换
          */
-      .header-controls {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-      }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-      /*
+        /*
          * 主题切换器样式
          */
-      .theme-switcher {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-      /*
+        /*
          * 表单元素统一样式 - 主题切换下拉框和搜索输入框
          */
-      .theme-switcher select,
-      .search-input {
-        padding: 8px 12px;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        background: var(--card-bg);
-        color: var(--text-color);
-        transition: var(--transition);
-      }
+        .theme-switcher select,
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
 
-      /*
+        /*
          * 表单元素获得焦点时的样式
          */
-      .theme-switcher select:focus,
-      .search-input:focus {
-        outline: none; /* 移除默认焦点轮廓 */
-        box-shadow: 0 0 0 2px var(--primary-color); /* 自定义焦点效果 */
-      }
+        .theme-switcher select:focus,
+        .search-input:focus {
+            outline: none;  /* 移除默认焦点轮廓 */
+            box-shadow: 0 0 0 2px var(--primary-color);  /* 自定义焦点效果 */
+        }
 
-      /*
+        /*
          * 搜索容器 - 相对定位，为内部绝对定位元素提供参考
          */
-      .search-container {
-        position: relative;
-        min-width: 250px;
-      }
+        .search-container {
+            position: relative;
+            min-width: 250px;
+        }
 
-      /*
+        /*
          * 搜索输入框样式
          */
-      .search-input {
-        width: 100%;
-        padding: 10px 40px 10px 15px; /* 右侧留出空间给图标 */
-        border-radius: 25px; /* 圆角边框 */
-      }
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;  /* 右侧留出空间给图标 */
+            border-radius: 25px;            /* 圆角边框 */
+        }
 
-      /*
+        /*
          * 搜索图标 - 绝对定位在输入框右侧
          */
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%); /* 垂直居中 */
-        opacity: 0.6;
-      }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);  /* 垂直居中 */
+            opacity: 0.6;
+        }
 
-      /*
+        /*
          * 搜索清除按钮 - 有内容时显示
          */
-      .search-clear {
-        position: absolute;
-        right: 35px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        cursor: pointer;
-        opacity: 0.6;
-        display: none; /* 默认隐藏 */
-      }
+        .search-clear {
+            position: absolute;
+            right: 35px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.6;
+            display: none;  /* 默认隐藏 */
+        }
 
-      /*
+        /*
          * 终端模式容器 - 默认隐藏，Geek主题时显示
          */
-      .terminal-container {
-        display: none;
-        margin: 20px;
-      }
+        .terminal-container {
+            display: none;
+            margin: 20px;
+        }
 
-      /*
+        /*
          * Geek主题下的终端容器样式 - 填充满整个屏幕
          */
-      [data-theme="geek"] .terminal-container {
-        margin: 0;
-        padding: 20px;
-        min-height: calc(100vh - 120px); /* 减去头部高度，填充剩余空间 */
-        display: flex;
-        flex-direction: column;
-      }
+        [data-theme="geek"] .terminal-container {
+            margin: 0;
+            padding: 20px;
+            min-height: calc(100vh - 120px);  /* 减去头部高度，填充剩余空间 */
+            display: flex;
+            flex-direction: column;
+        }
 
-      /*
+        /*
          * Geek主题下的控制台样式调整
          */
-      [data-theme="geek"] .console {
-        flex: 1; /* 占据剩余空间 */
-        min-height: 300px;
-        height: auto;
-      }
+        [data-theme="geek"] .console {
+            flex: 1;  /* 占据剩余空间 */
+            min-height: 300px;
+            height: auto;
+        }
 
-      /*
+        /*
          * ASCII艺术字样式 - 终端模式的标题
          */
-      .ascii-art {
-        color: #0f0; /* 绿色文字 */
-        white-space: pre; /* 保留空格和换行 */
-        font-size: 12px;
-        margin: 20px 0;
-        text-shadow: 0 0 5px #0f0; /* 绿色发光效果 */
-        /* animation: flicker 2s infinite;  闪烁动画 */
-      }
+        .ascii-art {
+            color: #0f0;                    /* 绿色文字 */
+            white-space: pre;               /* 保留空格和换行 */
+            font-size: 12px;
+            margin: 20px 0;
+            text-shadow: 0 0 5px #0f0;      /* 绿色发光效果 */
+            /* animation: flicker 2s infinite;  闪烁动画 */
+        }
 
-      /*
+        /*
          * 闪烁动画定义 - 模拟老式终端效果
          */
-      @keyframes flicker {
-        0%,
-        19%,
-        21%,
-        23%,
-        25%,
-        54%,
-        56%,
-        100% {
-          opacity: 1;
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                opacity: 0.5;
+            }
         }
-        20%,
-        24%,
-        55% {
-          opacity: 0.5;
-        }
-      }
 
-      /*
+        /*
          * 终端控制台样式
          */
-      .console {
-        border: 1px solid #0f0;
-        padding: 15px;
-        height: 400px;
-        overflow-y: auto; /* 垂直滚动 */
-        background: rgba(0, 0, 0, 0.8); /* 半透明黑色背景 */
-        font-family: "Courier New", monospace; /* 等宽字体 */
-        color: #0f0;
-        font-size: 12px;
-        box-shadow: 0 0 10px #0f0; /* 绿色发光边框 */
-      }
+        .console {
+            border: 1px solid #0f0;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;                    /* 垂直滚动 */
+            background: rgba(0, 0, 0, 0.8);     /* 半透明黑色背景 */
+            font-family: 'Courier New', monospace;  /* 等宽字体 */
+            color: #0f0;
+            font-size: 12px;
+            box-shadow: 0 0 10px #0f0;          /* 绿色发光边框 */
+        }
 
-      /*
+        /*
          * 终端内容网格布局 - 自适应列数
          */
-      .console-columns {
-        display: grid;
-        grid-template-columns: repeat(
-          auto-fit,
-          minmax(220px, 1fr)
-        ); /* 自适应列，最小220px */
-        gap: 12px 18px;
-      }
+        .console-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));  /* 自适应列，最小220px */
+            gap: 12px 18px;
+        }
 
-      /*
+        /*
          * 终端列样式
          */
-      .console-col {
-        border: 1px solid currentColor; /* 使用当前文字颜色作为边框色 */
-        border-radius: 6px;
-        padding: 8px 10px;
-        background: rgba(0, 0, 0, 0.25);
-      }
+        .console-col {
+            border: 1px solid currentColor;  /* 使用当前文字颜色作为边框色 */
+            border-radius: 6px;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.25);
+        }
 
-      /*
+        /*
          * 列标题样式
          */
-      .col-title {
-        font-weight: 700;
-        margin-bottom: 6px;
-      }
+        .col-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
 
-      /*
+        /*
          * 分隔线样式
          */
-      .col-sep {
-        height: 1px;
-        background: currentColor;
-        opacity: 0.35;
-        margin-bottom: 6px;
-      }
+        .col-sep {
+            height: 1px;
+            background: currentColor;
+            opacity: 0.35;
+            margin-bottom: 6px;
+        }
 
-      /*
+        /*
          * 列表项样式 - 文本溢出处理
          */
-      .col-item {
-        line-height: 1.4;
-        white-space: nowrap; /* 不换行 */
-        overflow: hidden; /* 隐藏溢出 */
-        text-overflow: ellipsis; /* 溢出显示省略号 */
-      }
+        .col-item {
+            line-height: 1.4;
+            white-space: nowrap;      /* 不换行 */
+            overflow: hidden;         /* 隐藏溢出 */
+            text-overflow: ellipsis;  /* 溢出显示省略号 */
+        }
 
-      /*
+        /*
          * 终端输入行样式
          */
-      .input-line {
-        display: flex;
-        align-items: center;
-        margin: 10px 0;
-      }
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
 
-      /*
+        /*
          * 终端提示符样式
          */
-      .input-line span {
-        margin-right: 5px;
-        color: #0f0;
-        text-shadow: 0 0 5px #0f0;
-      }
+        .input-line span {
+            margin-right: 5px;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+        }
 
-      /*
+        /*
          * 终端输入框样式
          */
-      .terminal-input {
-        flex: 1; /* 占据剩余空间 */
-        background: #000;
-        color: #0f0;
-        border: 1px solid #0f0;
-        font-family: "Courier New", monospace;
-        padding: 5px;
-        box-shadow:
-          0 0 5px #0f0,
-          inset 0 0 5px #0f0; /* 内外发光效果 */
-      }
+        .terminal-input {
+            flex: 1;  /* 占据剩余空间 */
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 5px;
+            box-shadow: 0 0 5px #0f0, inset 0 0 5px #0f0;  /* 内外发光效果 */
+        }
 
-      /*
+        /*
          * 主要内容区域样式
          */
-      .main {
-        padding: 40px 0;
-        min-height: calc(100vh - 200px); /* 最小高度：视口高度减去200px */
-      }
+        .main {
+            padding: 40px 0;
+            min-height: calc(100vh - 200px);  /* 最小高度：视口高度减去200px */
+        }
 
-      /*
+        /*
          * 分类区域样式
          */
-      .category {
-        margin-bottom: 50px;
-        transition: opacity 0.3s ease; /* 透明度过渡，用于搜索时的隐藏效果 */
-      }
+        .category {
+            margin-bottom: 50px;
+            transition: opacity 0.3s ease;  /* 透明度过渡，用于搜索时的隐藏效果 */
+        }
 
-      /*
+        /*
          * 隐藏状态的分类 - 搜索时使用
          */
-      .category.hidden {
-        opacity: 0.3;
-      }
+        .category.hidden {
+            opacity: 0.3;
+        }
 
-      /*
+        /*
          * 分类标题样式
          */
-      .category-title {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid var(--primary-color); /* 底部边框装饰 */
-        display: inline-block; /* 边框只占据文字宽度 */
-      }
+        .category-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);  /* 底部边框装饰 */
+            display: inline-block;  /* 边框只占据文字宽度 */
+        }
 
-      /*
+        /*
          * 链接网格布局 - 自适应卡片布局
          */
-      .links-grid {
-        display: grid;
-        grid-template-columns: repeat(
-          auto-fit,
-          minmax(280px, 1fr)
-        ); /* 自适应列，最小280px */
-        gap: 20px;
-      }
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));  /* 自适应列，最小280px */
+            gap: 20px;
+        }
 
-      /*
+        /*
          * 链接卡片样式 - 每个网站的展示卡片
          */
-      .link-card {
-        display: flex;
-        align-items: center;
-        padding: 20px;
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        text-decoration: none; /* 移除链接下划线 */
-        color: var(--text-color);
-        background: var(--card-bg);
-        box-shadow: var(--shadow);
-        transition: var(--transition);
-      }
+        .link-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-decoration: none;  /* 移除链接下划线 */
+            color: var(--text-color);
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
 
-      /*
+        /*
          * 隐藏状态的卡片 - 搜索时使用
          */
-      .link-card.hidden {
-        display: none;
-      }
+        .link-card.hidden {
+            display: none;
+        }
 
-      /*
+        /*
          * 卡片悬停效果
          */
-      .link-card:hover {
-        transform: translateY(-2px); /* 向上移动2px */
-        border-color: var(--primary-color);
-      }
+        .link-card:hover {
+            transform: translateY(-2px);  /* 向上移动2px */
+            border-color: var(--primary-color);
+        }
 
-      /*
+        /*
          * 链接图标样式
          */
-      .link-icon {
-        font-size: 2rem;
-        margin-right: 15px;
-        flex-shrink: 0; /* 不缩小 */
-      }
+        .link-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            flex-shrink: 0;  /* 不缩小 */
+        }
 
-      /*
+        /*
          * 链接信息区域样式
          */
-      .link-info h3 {
-        font-size: 1.1rem;
-        margin-bottom: 5px;
-        font-weight: 600;
-      }
+        .link-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
 
-      .link-info p {
-        font-size: 0.9rem;
-        opacity: 0.8; /* 半透明效果 */
-      }
+        .link-info p {
+            font-size: 0.9rem;
+            opacity: 0.8;  /* 半透明效果 */
+        }
 
-      /*
+        /*
          * 页脚样式
          */
-      .footer {
-        padding: 30px 0;
-        border-top: 1px solid var(--border-color);
-        text-align: center;
-      }
+        .footer {
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
 
-      /*
+        /*
          * 返回顶部按钮样式
          */
-      .scroll-to-top {
-        position: fixed; /* 固定定位 */
-        bottom: 30px;
-        right: 30px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%; /* 圆形按钮 */
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        background: var(--primary-color);
-        color: white;
-        z-index: 999;
-        opacity: 0; /* 默认透明 */
-        transform: scale(0); /* 默认缩放为0 */
-        transition: var(--transition);
-      }
+        .scroll-to-top {
+            position: fixed;  /* 固定定位 */
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;  /* 圆形按钮 */
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            background: var(--primary-color);
+            color: white;
+            z-index: 999;
+            opacity: 0;          /* 默认透明 */
+            transform: scale(0); /* 默认缩放为0 */
+            transition: var(--transition);
+        }
 
-      /*
+        /*
          * 显示状态的返回顶部按钮
          */
-      .scroll-to-top.show {
-        opacity: 1;
-        transform: scale(1);
-      }
+        .scroll-to-top.show {
+            opacity: 1;
+            transform: scale(1);
+        }
 
-      /*
+        /*
          * 通知消息样式
          */
-      .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 6px;
-        background: var(--primary-color);
-        color: white;
-        z-index: 1000;
-        transform: translateX(100%); /* 默认在右侧外部 */
-        transition: transform 0.3s ease;
-      }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            background: var(--primary-color);
+            color: white;
+            z-index: 1000;
+            transform: translateX(100%);  /* 默认在右侧外部 */
+            transition: transform 0.3s ease;
+        }
 
-      /*
+        /*
          * 显示状态的通知消息
          */
-      .notification.show {
-        transform: translateX(0); /* 滑入显示 */
-      }
+        .notification.show {
+            transform: translateX(0);  /* 滑入显示 */
+        }
 
-      /*
+        /*
          * 主题样式定义 - 通过data-theme属性切换
          * 类似于后端的配置切换，通过修改CSS变量实现主题切换
          */
 
-      /* 简约主题 */
-      [data-theme="minimal"] {
-        --primary-color: #2196f3;
-        --bg-color: #ffffff;
-        --text-color: #333333;
-        --border-color: #e0e0e0;
-        --card-bg: #ffffff;
-      }
-
-      /* 极客主题 */
-      [data-theme="geek"] {
-        --primary-color: #00ff00;
-        --bg-color: #0a0a0a;
-        --text-color: #00ff00;
-        --border-color: #00ff00;
-        --card-bg: #1a1a1a;
-        font-family: "Courier New", monospace;
-      }
-
-      /* 极客主题特殊样式 - 隐藏普通内容，显示终端 */
-      [data-theme="geek"] .main {
-        display: none;
-      }
-
-      [data-theme="geek"] .terminal-container {
-        display: block;
-      }
-
-      [data-theme="geek"] .logo::before {
-        content: "> "; /* Logo前添加终端提示符 */
-      }
-
-      /* Matrix主题 */
-      [data-theme="matrix"] {
-        --primary-color: #0f0;
-        --bg-color: #000;
-        --text-color: #0f0;
-        --border-color: #0f0;
-        --card-bg: rgba(0, 0, 0, 0.8);
-        font-family: "Courier New", monospace;
-      }
-
-      /* Matrix主题特殊效果 */
-      [data-theme="matrix"] #matrix-canvas {
-        opacity: 1; /* 显示Matrix背景 */
-      }
-
-      [data-theme="matrix"] .logo {
-        animation: flicker 2s infinite;
-      }
-
-      [data-theme="matrix"] .category-title {
-        animation: flicker 3s infinite;
-      }
-
-      /* 炫酷主题 - 渐变背景 */
-      [data-theme="cool"] {
-        --primary-color: #4ecdc4;
-        --bg-color: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
-        --text-color: #ffffff;
-        --border-color: #4ecdc4;
-        --card-bg: rgba(26, 26, 46, 0.8);
-        background: var(--bg-color);
-        animation: backgroundShift 10s ease-in-out infinite;
-      }
-
-      /* 背景渐变动画 */
-      @keyframes backgroundShift {
-        0%,
-        100% {
-          background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+        /* 简约主题 */
+        [data-theme="minimal"] {
+            --primary-color: #2196F3;
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --card-bg: #ffffff;
         }
-        50% {
-          background: linear-gradient(45deg, #0f3460, #1a1a2e, #16213e);
+
+        /* 极客主题 */
+        [data-theme="geek"] {
+            --primary-color: #00ff00;
+            --bg-color: #0a0a0a;
+            --text-color: #00ff00;
+            --border-color: #00ff00;
+            --card-bg: #1a1a1a;
+            font-family: 'Courier New', monospace;
         }
-      }
 
-      /* 商务主题 */
-      [data-theme="business"] {
-        --primary-color: #667eea;
-        --bg-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --text-color: #ffffff;
-        --border-color: rgba(255, 255, 255, 0.3);
-        --card-bg: rgba(255, 255, 255, 0.1);
-        background: var(--bg-color);
-      }
+        /* 极客主题特殊样式 - 隐藏普通内容，显示终端 */
+        [data-theme="geek"] .main {
+            display: none;
+        }
 
-      /*
+        [data-theme="geek"] .terminal-container {
+            display: block;
+        }
+
+        [data-theme="geek"] .logo::before {
+            content: '> ';  /* Logo前添加终端提示符 */
+        }
+
+        /* Matrix主题 */
+        [data-theme="matrix"] {
+            --primary-color: #0f0;
+            --bg-color: #000;
+            --text-color: #0f0;
+            --border-color: #0f0;
+            --card-bg: rgba(0, 0, 0, 0.8);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Matrix主题特殊效果 */
+        [data-theme="matrix"] #matrix-canvas {
+            opacity: 1;  /* 显示Matrix背景 */
+        }
+
+        [data-theme="matrix"] .logo {
+            animation: flicker 2s infinite;
+        }
+
+        [data-theme="matrix"] .category-title {
+            animation: flicker 3s infinite;
+        }
+
+        /* 炫酷主题 - 渐变背景 */
+        [data-theme="cool"] {
+            --primary-color: #4ecdc4;
+            --bg-color: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            --text-color: #ffffff;
+            --border-color: #4ecdc4;
+            --card-bg: rgba(26, 26, 46, 0.8);
+            background: var(--bg-color);
+            animation: backgroundShift 10s ease-in-out infinite;
+        }
+
+        /* 背景渐变动画 */
+        @keyframes backgroundShift {
+            0%, 100% {
+                background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460);
+            }
+            50% {
+                background: linear-gradient(45deg, #0f3460, #1a1a2e, #16213e);
+            }
+        }
+
+        /* 商务主题 */
+        [data-theme="business"] {
+            --primary-color: #667eea;
+            --bg-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-color: #ffffff;
+            --border-color: rgba(255, 255, 255, 0.3);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            background: var(--bg-color);
+        }
+
+        /*
          * 响应式设计 - 移动端适配
          * 当屏幕宽度小于768px时应用这些样式
          */
-      @media (max-width: 768px) {
-        .header .container {
-          flex-direction: column; /* 垂直排列 */
-        }
+        @media (max-width: 768px) {
+            .header .container {
+                flex-direction: column;  /* 垂直排列 */
+            }
 
-        .search-container {
-          min-width: 200px;
-        }
+            .search-container {
+                min-width: 200px;
+            }
 
-        .links-grid {
-          grid-template-columns: 1fr; /* 单列布局 */
-        }
+            .links-grid {
+                grid-template-columns: 1fr;  /* 单列布局 */
+            }
 
-        .console {
-          height: 300px; /* 减小终端高度 */
+            .console {
+                height: 300px;  /* 减小终端高度 */
+            }
         }
-      }
     </style>
-  </head>
+</head>
 
-  <body data-theme="minimal">
+<body data-theme="minimal">
     <!-- Matrix背景画布，用于Matrix主题的动画效果 -->
     <canvas id="matrix-canvas"></canvas>
 
     <!-- 页面头部导航栏 -->
     <header class="header">
-      <div class="container">
-        <!-- 网站Logo -->
-        <h1 class="logo">🚀 终极程序员导航</h1>
+        <div class="container">
+            <!-- 网站Logo -->
+            <h1 class="logo">🚀 终极程序员导航</h1>
 
-        <!-- 头部控制区域：搜索框和主题切换 -->
-        <div class="header-controls">
-          <!-- 搜索功能区域 -->
-          <div class="search-container">
-            <input
-              type="text"
-              class="search-input"
-              placeholder="搜索网站..."
-              id="searchInput"
-            />
-            <button class="search-clear" id="searchClear">×</button>
-            <span class="search-icon">🔍</span>
-          </div>
+            <!-- 头部控制区域：搜索框和主题切换 -->
+            <div class="header-controls">
+                <!-- 搜索功能区域 -->
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="搜索网站..." id="searchInput">
+                    <button class="search-clear" id="searchClear">×</button>
+                    <span class="search-icon">🔍</span>
+                </div>
 
-          <!-- 主题切换器 -->
-          <div class="theme-switcher">
-            <label>主题:</label>
-            <select id="theme-select">
-              <option value="minimal">简约</option>
-              <option value="business">商务</option>
-              <option value="cool">炫酷</option>
-              <option value="geek">Geek</option>
-              <option value="matrix">Matrix</option>
-            </select>
-          </div>
+                <!-- 主题切换器 -->
+                <div class="theme-switcher">
+                    <label>主题:</label>
+                    <select id="theme-select">
+                        <option value="minimal">简约</option>
+                        <option value="business">商务</option>
+                        <option value="cool">炫酷</option>
+                        <option value="geek">Geek</option>
+                        <option value="matrix">Matrix</option>
+                    </select>
+                </div>
+            </div>
         </div>
-      </div>
     </header>
 
     <!-- 终端模式容器，仅在Geek主题时显示 -->
     <div class="terminal-container">
-      <!-- ASCII艺术字标题 -->
-      <div class="ascii-art">
-        ████████╗███████╗██████╗ ███╗ ███╗██╗███╗ ██╗ █████╗ ██╗
-        ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗ ██║██╔══██╗██║ ██║ █████╗
-        ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║ ██║ ██╔══╝
-        ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║ ██║ ███████╗██║ ██║██║ ╚═╝
-        ██║██║██║ ╚████║██║ ██║███████╗ ╚═╝ ╚══════╝╚═╝ ╚═╝╚═╝ ╚═╝╚═╝╚═╝
-        ╚═══╝╚═╝ ╚═╝╚══════╝
-      </div>
+        <!-- ASCII艺术字标题 -->
+        <div class="ascii-art">
+████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗
+╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║
+   ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║
+   ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║
+   ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
+   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝</div>
 
-      <!-- 终端控制台，显示网站列表 -->
-      <div class="console" id="console"></div>
+        <!-- 终端控制台，显示网站列表 -->
+        <div class="console" id="console"></div>
 
-      <!-- 终端输入行 -->
-      <div class="input-line">
-        <span>root@navigator:~$</span>
-        <input
-          type="text"
-          class="terminal-input"
-          id="terminalInput"
-          placeholder="输入编号或关键词..."
-        />
-      </div>
+        <!-- 终端输入行 -->
+        <div class="input-line">
+            <span>root@navigator:~$</span>
+            <input type="text" class="terminal-input" id="terminalInput" placeholder="输入编号或关键词...">
+        </div>
     </div>
 
     <!-- 主要内容区域 -->
     <main class="main">
-      <div class="container" id="main-container">
-        <!-- 这里将通过JavaScript动态生成网站分类和链接卡片 -->
-      </div>
+        <div class="container" id="main-container">
+            <!-- 这里将通过JavaScript动态生成网站分类和链接卡片 -->
+        </div>
     </main>
 
     <!-- 页脚 -->
     <footer class="footer">
-      <div class="container">
-        <p>&copy; 2024 终极程序员导航</p>
-      </div>
+        <div class="container">
+            <p>&copy; 2024 终极程序员导航</p>
+        </div>
     </footer>
 
     <!-- 返回顶部按钮 -->
     <button class="scroll-to-top" id="scrollToTop">↑</button>
 
     <script>
-      /**
-       * 网站配置数据
-       * 类似于后端的数据模型，定义了所有网站的信息
-       */
-      const CONFIG = {
-        // 分类定义
-        categories: {
-          技术论坛: { title: "🗣️ 技术论坛", key: "forum" },
-          AI工具: { title: "🤖 AI工具", key: "ai" },
-          MCP工具: { title: "🔧 MCP工具", key: "mcp" },
-          学习资源: { title: "📖 学习资源", key: "learning" },
-          大佬博客: { title: "👨‍💻 大佬博客", key: "techblog" },
-          大厂分享: { title: "🏢 大厂分享", key: "techshare" },
-        },
-
-        // 网站数据数组
-        sites: [
-          // 技术论坛分类
-          {
-            name: "V2EX",
-            url: "https://www.v2ex.com",
-            desc: "创意工作者们的社区",
-            category: "技术论坛",
-            icon: "💬",
-            keywords: "v2ex 社区 讨论",
-          },
-          {
-            name: "掘金",
-            url: "https://juejin.cn",
-            desc: "优质技术文章分享平台",
-            category: "技术论坛",
-            icon: "💎",
-            keywords: "掘金 文章 技术",
-          },
-          {
-            name: "Stack Overflow",
-            url: "https://stackoverflow.com",
-            desc: "全球最大的程序员问答社区",
-            category: "技术论坛",
-            icon: "📚",
-            keywords: "stackoverflow 问答 编程",
-          },
-          {
-            name: "SegmentFault",
-            url: "https://segmentfault.com",
-            desc: "中文技术问答社区",
-            category: "技术论坛",
-            icon: "🔧",
-            keywords: "segmentfault 思否 中文",
-          },
-          {
-            name: "博客园",
-            url: "https://www.cnblogs.com",
-            desc: "开发者技术博客平台",
-            category: "技术论坛",
-            icon: "📝",
-            keywords: "博客园 博客 技术",
-          },
-          {
-            name: "CSDN",
-            url: "https://www.csdn.net",
-            desc: "专业IT技术社区",
-            category: "技术论坛",
-            icon: "🌐",
-            keywords: "csdn 博客 资源",
-          },
-          {
-            name: "开源中国",
-            url: "https://www.oschina.net",
-            desc: "中文开源技术交流社区",
-            category: "技术论坛",
-            icon: "🌸",
-            keywords: "开源中国 oschina 中文",
-          },
-          {
-            name: "GitHub",
-            url: "https://github.com",
-            desc: "全球最大的代码托管平台",
-            category: "技术论坛",
-            icon: "🐙",
-            keywords: "github 代码 托管",
-          },
-          {
-            name: "Gitee",
-            url: "https://gitee.com",
-            desc: "国内领先的代码托管平台",
-            category: "技术论坛",
-            icon: "🦄",
-            keywords: "gitee 码云 国内",
-          },
-          {
-            name: "GitCode",
-            url: "https://gitcode.com",
-            desc: "中国领先的代码托管平台",
-            category: "技术论坛",
-            icon: "🦄",
-            keywords: "gitcode 码云 国内",
-          },
-
-          // 学习资源分类
-          {
-            name: "菜鸟教程",
-            url: "https://www.runoob.com",
-            desc: "编程入门学习网站",
-            category: "学习资源",
-            icon: "🐦",
-            keywords: "菜鸟教程 入门 学习",
-          },
-          {
-            name: "LeetCode",
-            url: "https://leetcode.cn",
-            desc: "算法题练习平台",
-            category: "学习资源",
-            icon: "🧩",
-            keywords: "leetcode 算法 刷题",
-          },
-          {
-            name: "牛客网",
-            url: "https://www.nowcoder.com",
-            desc: "面试经验与笔试真题",
-            category: "学习资源",
-            icon: "🐂",
-            keywords: "牛客网 面试 笔试",
-          },
-          {
-            name: "Ledge DevOps知识平台",
-            url: "https://devops.phodal.com/home",
-            desc: "DevOps工具元素周期表和知识体系",
-            category: "学习资源",
-            icon: "⚙️",
-            keywords: "DevOps 工具 实践 知识平台",
-          },
-          {
-            name: "Coursera",
-            url: "https://www.coursera.org",
-            desc: "在线课程学习平台",
-            category: "学习资源",
-            icon: "🎓",
-            keywords: "coursera 课程 在线",
-          },
-          {
-            name: "W3School",
-            url: "https://www.w3school.com.cn",
-            desc: "Web技术教程网站",
-            category: "学习资源",
-            icon: "📚",
-            keywords: "w3school 教程 前端",
-          },
-          {
-            name: "freeCodeCamp",
-            url: "https://www.freecodecamp.org",
-            desc: "免费编程训练营",
-            category: "学习资源",
-            icon: "🏕️",
-            keywords: "freecodecamp 免费 编程",
-          },
-          {
-            name: "InfoQ中文",
-            url: "https://www.infoq.cn",
-            desc: "架构与技术趋势",
-            category: "学习资源",
-            icon: "📊",
-            keywords: "infoq 架构 趋势",
-          },
-          {
-            name: "System Design Newsletter",
-            url: "https://newsletter.systemdesign.one/",
-            desc: "系统设计技术通讯",
-            category: "学习资源",
-            icon: "📧",
-            keywords: "系统设计 通讯 架构",
-          },
-          {
-            name: "AlgoMaster",
-            url: "https://blog.algomaster.io/t/system-design",
-            desc: "算法与系统设计技术博客",
-            category: "学习资源",
-            icon: "🧮",
-            keywords: "算法 系统设计 面试",
-          },
-
-          // AI工具分类
-          {
-            name: "OpenAI",
-            url: "https://openai.com",
-            desc: "ChatGPT和GPT模型开发商",
-            category: "AI工具",
-            icon: "🤖",
-            keywords: "openai chatgpt gpt ai",
-          },
-          {
-            name: "Anthropic Claude",
-            url: "https://claude.ai",
-            desc: "Claude AI助手平台",
-            category: "AI工具",
-            icon: "🧠",
-            keywords: "claude anthropic ai 助手",
-          },
-          {
-            name: "GitHub Copilot",
-            url: "https://github.com/features/copilot",
-            desc: "AI编程助手",
-            category: "AI工具",
-            icon: "👨‍💻",
-            keywords: "github copilot ai 编程",
-          },
-          {
-            name: "Hugging Face",
-            url: "https://huggingface.co/blog/zh",
-            desc: "机器学习模型社区",
-            category: "AI工具",
-            icon: "🤗",
-            keywords: "huggingface 模型 机器学习",
-          },
-          {
-            name: "Hugging Face 镜像",
-            url: "https://hf-mirror.com/",
-            desc: "Hugging Face 模型镜像",
-            category: "AI工具",
-            icon: "🤗",
-            keywords: "huggingface 模型 镜像",
-          },
-          {
-            name: "魔塔社区",
-            url: "https://www.modelscope.cn/mcp",
-            desc: "魔塔社区",
-            category: "AI工具",
-            icon: "🔧",
-            keywords: "魔塔社区",
-          },
-          {
-            name: "LangChain",
-            url: "https://langchain.com",
-            desc: "构建LLM应用的框架",
-            category: "AI工具",
-            icon: "🔗",
-            keywords: "langchain llm 框架",
-          },
-          {
-            name: "Ollama",
-            url: "https://ollama.ai",
-            desc: "本地运行大语言模型",
-            category: "AI工具",
-            icon: "🦙",
-            keywords: "ollama 本地 大模型",
-          },
-          {
-            name: "Midjourney",
-            url: "https://midjourney.com",
-            desc: "AI图像生成工具",
-            category: "AI工具",
-            icon: "🎨",
-            keywords: "midjourney ai 图像生成",
-          },
-          {
-            name: "Stable Diffusion",
-            url: "https://stability.ai",
-            desc: "开源AI图像生成模型",
-            category: "AI工具",
-            icon: "🖼️",
-            keywords: "stable diffusion ai 图像",
-          },
-          {
-            name: "LMArena",
-            url: "https://lmarena.ai/",
-            desc: "AI模型评估平台",
-            category: "AI工具",
-            icon: "🤖",
-            keywords: "用户对不同AI模型的回答进行匿名投票",
-          },
-          {
-            name: "OpenRouter",
-            url: "https://openrouter.ai/rankings",
-            desc: "AI模型排名",
-            category: "AI工具",
-            icon: "🤖",
-            keywords: "openrouter ai 模型排名",
-          },
-          {
-            name: "OpenCompass",
-            url: "https://rank.opencompass.org.cn/home",
-            desc: "AI模型排名",
-            category: "AI工具",
-            icon: "🤖",
-            keywords: "opencompass ai 模型排名",
-          },
-          {
-            name: "LangGPT",
-            url: "https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe",
-            desc: "LangGPT",
-            category: "AI工具",
-            icon: "🤖",
-            keywords: "langgpt",
-          },
-          // MCP技术分类
-          {
-            name: "AI工具集",
-            url: "https://ai-bot.cn/",
-            desc: "AI助手",
-            category: "MCP工具",
-            icon: "🤖",
-            keywords: "ai工具集",
-          },
-          {
-            name: "MCP",
-            url: "https://mcp.so/zh",
-            desc: "MCP工具",
-            category: "MCP工具",
-            icon: "🔧",
-            keywords: "发现优秀的 MCP 服务器与客户端",
-          },
-          {
-            name: "MCP Higress",
-            url: "https://mcp.higress.ai/",
-            desc: "MCP Higress",
-            category: "MCP工具",
-            icon: "🔧",
-            keywords: "MCP Higress",
-          },
-
-          // 大佬博客分类
-          {
-            name: "ByteByteGo",
-            url: "https://blog.bytebytego.com/",
-            desc: "Alex Xu的系统设计技术博客",
-            category: "大佬博客",
-            icon: "🏗️",
-            keywords: "系统设计 架构 Alex Xu",
-          },
-          {
-            name: "阮一峰的网络日志",
-            url: "https://www.ruanyifeng.com/blog/",
-            desc: "前端技术与互联网观察",
-            category: "大佬博客",
-            icon: "📝",
-            keywords: "阮一峰 前端 javascript",
-          },
-          {
-            name: "廖雪峰的官方网站",
-            url: "https://www.liaoxuefeng.com",
-            desc: "Python、Git等技术教程",
-            category: "大佬博客",
-            icon: "🐍",
-            keywords: "廖雪峰 python git 教程",
-          },
-          {
-            name: "云风的 BLOG",
-            url: "https://blog.codingnow.com",
-            desc: "游戏开发与系统架构",
-            category: "大佬博客",
-            icon: "🎮",
-            keywords: "云风 游戏开发 lua",
-          },
-          {
-            name: "池建强的随想录",
-            url: "http://macshuo.com",
-            desc: "技术管理与产品思考",
-            category: "大佬博客",
-            icon: "💭",
-            keywords: "池建强 管理 产品",
-          },
-          {
-            name: "Tim Yang",
-            url: "https://timyang.net",
-            desc: "系统架构与运维",
-            category: "大佬博客",
-            icon: "⚙️",
-            keywords: "timyang 架构 运维",
-          },
-          {
-            name: "Fenng's Blog",
-            url: "http://dbanotes.net",
-            desc: "数据库与技术管理",
-            category: "大佬博客",
-            icon: "🗄️",
-            keywords: "fenng 数据库 dba",
-          },
-          {
-            name: "当然我在扯淡",
-            url: "http://www.yinwang.org",
-            desc: "王垠的技术思考",
-            category: "大佬博客",
-            icon: "💬",
-            keywords: "王垠 思考 编程",
-          },
-          {
-            name: "左耳朵耗子",
-            url: "https://coolshell.cn",
-            desc: "陈皓的技术分享",
-            category: "大佬博客",
-            icon: "👂",
-            keywords: "陈皓 左耳朵耗子 架构",
-          },
-
-          // 大厂分享分类
-          {
-            name: "腾讯技术工程",
-            url: "https://cloud.tencent.com/developer",
-            desc: "腾讯技术团队分享",
-            category: "大厂分享",
-            icon: "🐧",
-            keywords: "腾讯 技术工程 云开发",
-          },
-          {
-            name: "字节跳动技术团队",
-            url: "https://juejin.cn/user/1838039172387262",
-            desc: "字节跳动官方技术分享",
-            category: "大厂分享",
-            icon: "🎯",
-            keywords: "字节跳动 抖音 技术团队",
-          },
-          {
-            name: "美团技术团队",
-            url: "https://tech.meituan.com",
-            desc: "美团点评技术博客",
-            category: "大厂分享",
-            icon: "🛵",
-            keywords: "美团 点评 技术博客",
-          },
-          {
-            name: "华为技术",
-            url: "https://developer.huawei.com/consumer/cn/forum",
-            desc: "华为开发者社区",
-            category: "大厂分享",
-            icon: "📡",
-            keywords: "华为 鸿蒙 开发者",
-          },
-        ],
-      };
-
-      /**
-       * Matrix动画效果类
-       * 负责Matrix主题的背景动画效果
-       */
-      class MatrixAnimation {
         /**
-         * 构造函数 - 初始化Matrix动画
+         * 网站配置数据
+         * 类似于后端的数据模型，定义了所有网站的信息
          */
-        constructor() {
-          this.canvas = document.getElementById("matrix-canvas");
-          this.ctx = this.canvas.getContext("2d");
-          this.isRunning = false; // 动画运行状态
-          this.init();
-        }
+        const CONFIG = {
+            // 分类定义
+            categories: {
+                "技术论坛": { title: "🗣️ 技术论坛", key: "forum" },
+                "AI工具": { title: "🤖 AI工具", key: "ai" },
+                "MCP工具": { title: "🔧 MCP工具", key: "mcp" },
+                "学习资源": { title: "📖 学习资源", key: "learning" },
+                "大佬博客": { title: "👨‍💻 大佬博客", key: "techblog" },
+                "大厂分享": { title: "🏢 大厂分享", key: "techshare" },
+            },
+
+            // 网站数据数组
+            sites: [
+                // 技术论坛分类
+                { name: "V2EX", url: "https://www.v2ex.com", desc: "创意工作者们的社区", category: "技术论坛", icon: "💬", keywords: "v2ex 社区 讨论" },
+                { name: "掘金", url: "https://juejin.cn", desc: "优质技术文章分享平台", category: "技术论坛", icon: "💎", keywords: "掘金 文章 技术" },
+                { name: "Stack Overflow", url: "https://stackoverflow.com", desc: "全球最大的程序员问答社区", category: "技术论坛", icon: "📚", keywords: "stackoverflow 问答 编程" },
+                { name: "SegmentFault", url: "https://segmentfault.com", desc: "中文技术问答社区", category: "技术论坛", icon: "🔧", keywords: "segmentfault 思否 中文" },
+                { name: "博客园", url: "https://www.cnblogs.com", desc: "开发者技术博客平台", category: "技术论坛", icon: "📝", keywords: "博客园 博客 技术" },
+                { name: "CSDN", url: "https://www.csdn.net", desc: "专业IT技术社区", category: "技术论坛", icon: "🌐", keywords: "csdn 博客 资源" },
+                { name: "开源中国", url: "https://www.oschina.net", desc: "中文开源技术交流社区", category: "技术论坛", icon: "🌸", keywords: "开源中国 oschina 中文" },
+                { name: "GitHub", url: "https://github.com", desc: "全球最大的代码托管平台", category: "技术论坛", icon: "🐙", keywords: "github 代码 托管" },
+                { name: "Gitee", url: "https://gitee.com", desc: "国内领先的代码托管平台", category: "技术论坛", icon: "🦄", keywords: "gitee 码云 国内" },
+                { name: "GitCode", url: "https://gitcode.com", desc: "中国领先的代码托管平台", category: "技术论坛", icon: "🦄", keywords: "gitcode 码云 国内" },
+
+                // 学习资源分类
+                { name: "菜鸟教程", url: "https://www.runoob.com", desc: "编程入门学习网站", category: "学习资源", icon: "🐦", keywords: "菜鸟教程 入门 学习" },
+                { name: "LeetCode", url: "https://leetcode.cn", desc: "算法题练习平台", category: "学习资源", icon: "🧩", keywords: "leetcode 算法 刷题" },
+                { name: "牛客网", url: "https://www.nowcoder.com", desc: "面试经验与笔试真题", category: "学习资源", icon: "🐂", keywords: "牛客网 面试 笔试" },
+                { name: "Ledge DevOps知识平台", url: "https://devops.phodal.com/home", desc: "DevOps工具元素周期表和知识体系", category: "学习资源", icon: "⚙️", keywords: "DevOps 工具 实践 知识平台" },
+                { name: "Coursera", url: "https://www.coursera.org", desc: "在线课程学习平台", category: "学习资源", icon: "🎓", keywords: "coursera 课程 在线" },
+                { name: "W3School", url: "https://www.w3school.com.cn", desc: "Web技术教程网站", category: "学习资源", icon: "📚", keywords: "w3school 教程 前端" },
+                { name: "freeCodeCamp", url: "https://www.freecodecamp.org", desc: "免费编程训练营", category: "学习资源", icon: "🏕️", keywords: "freecodecamp 免费 编程" },
+                { name: "InfoQ中文", url: "https://www.infoq.cn", desc: "架构与技术趋势", category: "学习资源", icon: "📊", keywords: "infoq 架构 趋势" },
+                { name: "System Design Newsletter", url: "https://newsletter.systemdesign.one/", desc: "系统设计技术通讯", category: "学习资源", icon: "📧", keywords: "系统设计 通讯 架构" },
+                { name: "AlgoMaster", url: "https://blog.algomaster.io/t/system-design", desc: "算法与系统设计技术博客", category: "学习资源", icon: "🧮", keywords: "算法 系统设计 面试" },
+
+                // AI工具分类
+                { name: "OpenAI", url: "https://openai.com", desc: "ChatGPT和GPT模型开发商", category: "AI工具", icon: "🤖", keywords: "openai chatgpt gpt ai" },
+                { name: "Anthropic Claude", url: "https://claude.ai", desc: "Claude AI助手平台", category: "AI工具", icon: "🧠", keywords: "claude anthropic ai 助手" },
+                { name: "GitHub Copilot", url: "https://github.com/features/copilot", desc: "AI编程助手", category: "AI工具", icon: "👨‍💻", keywords: "github copilot ai 编程" },
+                { name: "Hugging Face", url: "https://huggingface.co/blog/zh", desc: "机器学习模型社区", category: "AI工具", icon: "🤗", keywords: "huggingface 模型 机器学习" },
+                { name: "Hugging Face 镜像", url: "https://hf-mirror.com/", desc: "Hugging Face 模型镜像", category: "AI工具", icon: "🤗", keywords: "huggingface 模型 镜像" },
+                { name: "魔塔社区", url: "https://www.modelscope.cn/mcp", desc: "魔塔社区", category: "AI工具", icon: "🔧", keywords: "魔塔社区" },
+                { name: "LangChain", url: "https://langchain.com", desc: "构建LLM应用的框架", category: "AI工具", icon: "🔗", keywords: "langchain llm 框架" },
+                { name: "Ollama", url: "https://ollama.ai", desc: "本地运行大语言模型", category: "AI工具", icon: "🦙", keywords: "ollama 本地 大模型" },
+                { name: "Midjourney", url: "https://midjourney.com", desc: "AI图像生成工具", category: "AI工具", icon: "🎨", keywords: "midjourney ai 图像生成" },
+                { name: "Stable Diffusion", url: "https://stability.ai", desc: "开源AI图像生成模型", category: "AI工具", icon: "🖼️", keywords: "stable diffusion ai 图像" },
+                { name: "LMArena", url: "https://lmarena.ai/", desc: "AI模型评估平台", category: "AI工具", icon: "🤖", keywords: "用户对不同AI模型的回答进行匿名投票" },
+                { name: "OpenRouter", url: "https://openrouter.ai/rankings", desc: "AI模型排名", category: "AI工具", icon: "🤖", keywords: "openrouter ai 模型排名" },
+                { name: "OpenCompass", url: "https://rank.opencompass.org.cn/home", desc: "AI模型排名", category: "AI工具", icon: "🤖", keywords: "opencompass ai 模型排名" },
+                { name: "LangGPT", url: "https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe", desc: "LangGPT", category: "AI工具", icon: "🤖", keywords: "langgpt" },
+                // MCP技术分类
+                { name: "AI工具集", url: "https://ai-bot.cn/", desc: "AI助手", category: "MCP工具", icon: "🤖", keywords: "ai工具集" },
+                { name: "MCP", url: "https://mcp.so/zh", desc: "MCP工具", category: "MCP工具", icon: "🔧", keywords: "发现优秀的 MCP 服务器与客户端" },
+                { name: "MCP Higress", url: "https://mcp.higress.ai/", desc: "MCP Higress", category: "MCP工具", icon: "🔧", keywords: "MCP Higress" },
+
+                // 大佬博客分类
+                { name: "ByteByteGo", url: "https://blog.bytebytego.com/", desc: "Alex Xu的系统设计技术博客", category: "大佬博客", icon: "🏗️", keywords: "系统设计 架构 Alex Xu" },
+                { name: "阮一峰的网络日志", url: "https://www.ruanyifeng.com/blog/", desc: "前端技术与互联网观察", category: "大佬博客", icon: "📝", keywords: "阮一峰 前端 javascript" },
+                { name: "廖雪峰的官方网站", url: "https://www.liaoxuefeng.com", desc: "Python、Git等技术教程", category: "大佬博客", icon: "🐍", keywords: "廖雪峰 python git 教程" },
+                { name: "云风的 BLOG", url: "https://blog.codingnow.com", desc: "游戏开发与系统架构", category: "大佬博客", icon: "🎮", keywords: "云风 游戏开发 lua" },
+                { name: "池建强的随想录", url: "http://macshuo.com", desc: "技术管理与产品思考", category: "大佬博客", icon: "💭", keywords: "池建强 管理 产品" },
+                { name: "Tim Yang", url: "https://timyang.net", desc: "系统架构与运维", category: "大佬博客", icon: "⚙️", keywords: "timyang 架构 运维" },
+                { name: "Fenng's Blog", url: "http://dbanotes.net", desc: "数据库与技术管理", category: "大佬博客", icon: "🗄️", keywords: "fenng 数据库 dba" },
+                { name: "当然我在扯淡", url: "http://www.yinwang.org", desc: "王垠的技术思考", category: "大佬博客", icon: "💬", keywords: "王垠 思考 编程" },
+                { name: "左耳朵耗子", url: "https://coolshell.cn", desc: "陈皓的技术分享", category: "大佬博客", icon: "👂", keywords: "陈皓 左耳朵耗子 架构" },
+
+                // 大厂分享分类
+                { name: "腾讯技术工程", url: "https://cloud.tencent.com/developer", desc: "腾讯技术团队分享", category: "大厂分享", icon: "🐧", keywords: "腾讯 技术工程 云开发" },
+                { name: "字节跳动技术团队", url: "https://juejin.cn/user/1838039172387262", desc: "字节跳动官方技术分享", category: "大厂分享", icon: "🎯", keywords: "字节跳动 抖音 技术团队" },
+                { name: "美团技术团队", url: "https://tech.meituan.com", desc: "美团点评技术博客", category: "大厂分享", icon: "🛵", keywords: "美团 点评 技术博客" },
+                { name: "华为技术", url: "https://developer.huawei.com/consumer/cn/forum", desc: "华为开发者社区", category: "大厂分享", icon: "📡", keywords: "华为 鸿蒙 开发者" },
+            ]
+        };
 
         /**
-         * 初始化方法 - 设置画布大小和事件监听
+         * Matrix动画效果类
+         * 负责Matrix主题的背景动画效果
          */
-        init() {
-          this.resizeCanvas();
-          // 监听窗口大小变化，重新调整画布大小
-          window.addEventListener("resize", () => this.resizeCanvas());
-        }
-
-        /**
-         * 调整画布大小方法
-         * 根据窗口大小调整画布，并初始化下落字符数组
-         */
-        resizeCanvas() {
-          this.canvas.width = window.innerWidth;
-          this.canvas.height = window.innerHeight;
-          const fontSize = 14;
-          // 创建下落字符数组，每列一个字符
-          this.drops = Array(Math.floor(this.canvas.width / fontSize)).fill(1);
-          this.letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // 可显示的字符
-          this.fontSize = fontSize;
-        }
-
-        /**
-         * 开始动画方法
-         */
-        start() {
-          if (this.isRunning) return; // 避免重复启动
-          this.isRunning = true;
-          this.animate();
-        }
-
-        /**
-         * 停止动画方法
-         */
-        stop() {
-          this.isRunning = false;
-          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
-
-        /**
-         * 动画循环方法
-         * 使用requestAnimationFrame实现流畅动画
-         */
-        animate() {
-          if (!this.isRunning) return;
-
-          // 绘制半透明黑色背景，产生拖尾效果
-          this.ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-          // 设置字符样式
-          this.ctx.fillStyle = "#0f0";
-          this.ctx.font = this.fontSize + "px monospace";
-
-          // 绘制每列的字符
-          for (let i = 0; i < this.drops.length; i++) {
-            // 随机选择字符
-            const text = this.letters.charAt(
-              Math.floor(Math.random() * this.letters.length),
-            );
-            // 绘制字符
-            this.ctx.fillText(
-              text,
-              i * this.fontSize,
-              this.drops[i] * this.fontSize,
-            );
-
-            // 字符到达底部时，随机重置到顶部
-            if (
-              this.drops[i] * this.fontSize > this.canvas.height &&
-              Math.random() > 0.975
-            ) {
-              this.drops[i] = 0;
+        class MatrixAnimation {
+            /**
+             * 构造函数 - 初始化Matrix动画
+             */
+            constructor() {
+                this.canvas = document.getElementById('matrix-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.isRunning = false;  // 动画运行状态
+                this.init();
             }
-            this.drops[i]++; // 字符下落
-          }
 
-          // 继续下一帧动画
-          requestAnimationFrame(() => this.animate());
+            /**
+             * 初始化方法 - 设置画布大小和事件监听
+             */
+            init() {
+                this.resizeCanvas();
+                // 监听窗口大小变化，重新调整画布大小
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+
+            /**
+             * 调整画布大小方法
+             * 根据窗口大小调整画布，并初始化下落字符数组
+             */
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                const fontSize = 14;
+                // 创建下落字符数组，每列一个字符
+                this.drops = Array(Math.floor(this.canvas.width / fontSize)).fill(1);
+                this.letters = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ';  // 可显示的字符
+                this.fontSize = fontSize;
+            }
+
+            /**
+             * 开始动画方法
+             */
+            start() {
+                if (this.isRunning) return;  // 避免重复启动
+                this.isRunning = true;
+                this.animate();
+            }
+
+            /**
+             * 停止动画方法
+             */
+            stop() {
+                this.isRunning = false;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            /**
+             * 动画循环方法
+             * 使用requestAnimationFrame实现流畅动画
+             */
+            animate() {
+                if (!this.isRunning) return;
+
+                // 绘制半透明黑色背景，产生拖尾效果
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // 设置字符样式
+                this.ctx.fillStyle = '#0f0';
+                this.ctx.font = this.fontSize + 'px monospace';
+
+                // 绘制每列的字符
+                for (let i = 0; i < this.drops.length; i++) {
+                    // 随机选择字符
+                    const text = this.letters.charAt(Math.floor(Math.random() * this.letters.length));
+                    // 绘制字符
+                    this.ctx.fillText(text, i * this.fontSize, this.drops[i] * this.fontSize);
+
+                    // 字符到达底部时，随机重置到顶部
+                    if (this.drops[i] * this.fontSize > this.canvas.height && Math.random() > 0.975) {
+                        this.drops[i] = 0;
+                    }
+                    this.drops[i]++;  // 字符下落
+                }
+
+                // 继续下一帧动画
+                requestAnimationFrame(() => this.animate());
+            }
         }
-      }
-
-      /**
-       * 应用主类 - 整个应用的控制中心
-       * 类似于后端的Service层，负责协调各个功能模块
-       */
-      class UltimateNavigator {
-        /**
-         * 构造函数 - 初始化应用
-         */
-        constructor() {
-          this.matrix = new MatrixAnimation(); // Matrix动画实例
-          // 从本地存储获取主题设置，默认为简约主题
-          this.currentTheme =
-            localStorage.getItem("ultimate-nav-theme") || "minimal";
-          this.init();
-        }
 
         /**
-         * 初始化方法 - 启动应用的各个功能
+         * 应用主类 - 整个应用的控制中心
+         * 类似于后端的Service层，负责协调各个功能模块
          */
-        init() {
-          this.renderContent(); // 渲染页面内容
-          this.bindEvents(); // 绑定事件监听
-          this.applyTheme(this.currentTheme); // 应用主题
-          this.renderTerminal(); // 渲染终端内容
-        }
+        class UltimateNavigator {
+            /**
+             * 构造函数 - 初始化应用
+             */
+            constructor() {
+                this.matrix = new MatrixAnimation();  // Matrix动画实例
+                // 从本地存储获取主题设置，默认为简约主题
+                this.currentTheme = localStorage.getItem('ultimate-nav-theme') || 'minimal';
+                this.init();
+            }
 
-        /**
-         * 渲染页面内容方法
-         * 根据配置数据动态生成HTML结构
-         */
-        renderContent() {
-          const container = document.getElementById("main-container");
+            /**
+             * 初始化方法 - 启动应用的各个功能
+             */
+            init() {
+                this.renderContent();      // 渲染页面内容
+                this.bindEvents();         // 绑定事件监听
+                this.applyTheme(this.currentTheme);  // 应用主题
+                this.renderTerminal();     // 渲染终端内容
+            }
 
-          // 遍历每个分类
-          Object.keys(CONFIG.categories).forEach((categoryKey) => {
-            const category = CONFIG.categories[categoryKey];
+            /**
+             * 渲染页面内容方法
+             * 根据配置数据动态生成HTML结构
+             */
+            renderContent() {
+                const container = document.getElementById('main-container');
 
-            // 创建分类区域
-            const section = document.createElement("section");
-            section.className = "category";
+                // 遍历每个分类
+                Object.keys(CONFIG.categories).forEach(categoryKey => {
+                    const category = CONFIG.categories[categoryKey];
 
-            // 创建分类标题
-            const title = document.createElement("h2");
-            title.className = "category-title";
-            title.textContent = category.title;
-            section.appendChild(title);
+                    // 创建分类区域
+                    const section = document.createElement('section');
+                    section.className = 'category';
 
-            // 创建链接网格容器
-            const grid = document.createElement("div");
-            grid.className = "links-grid";
+                    // 创建分类标题
+                    const title = document.createElement('h2');
+                    title.className = 'category-title';
+                    title.textContent = category.title;
+                    section.appendChild(title);
 
-            // 筛选当前分类的网站并创建卡片
-            CONFIG.sites
-              .filter((site) => site.category === categoryKey)
-              .forEach((site) => {
-                const card = document.createElement("a");
-                card.href = site.url;
-                card.target = "_blank"; // 新窗口打开
-                card.className = "link-card";
-                card.setAttribute("data-keywords", site.keywords); // 用于搜索
+                    // 创建链接网格容器
+                    const grid = document.createElement('div');
+                    grid.className = 'links-grid';
 
-                // 设置卡片内容
-                card.innerHTML = `
+                    // 筛选当前分类的网站并创建卡片
+                    CONFIG.sites.filter(site => site.category === categoryKey).forEach(site => {
+                        const card = document.createElement('a');
+                        card.href = site.url;
+                        card.target = '_blank';  // 新窗口打开
+                        card.className = 'link-card';
+                        card.setAttribute('data-keywords', site.keywords);  // 用于搜索
+
+                        // 设置卡片内容
+                        card.innerHTML = `
                             <div class="link-icon">${site.icon}</div>
                             <div class="link-info">
                                 <h3>${site.name}</h3>
                                 <p>${site.desc}</p>
                             </div>
                         `;
-                grid.appendChild(card);
-              });
+                        grid.appendChild(card);
+                    });
 
-            section.appendChild(grid);
-            container.appendChild(section);
-          });
-        }
-
-        /**
-         * 渲染终端内容方法
-         * 为Geek主题生成终端风格的网站列表
-         */
-        renderTerminal() {
-          const console = document.getElementById("console");
-          const columns = document.createElement("div");
-          columns.className = "console-columns";
-
-          // 为每个分类创建一列
-          Object.keys(CONFIG.categories).forEach((categoryKey) => {
-            const col = document.createElement("div");
-            col.className = "console-col";
-
-            // 分类标题
-            const title = document.createElement("div");
-            title.className = "col-title";
-            title.textContent = `【${categoryKey}】`;
-            col.appendChild(title);
-
-            // 分隔线
-            const sep = document.createElement("div");
-            sep.className = "col-sep";
-            col.appendChild(sep);
-
-            // 网站列表项
-            CONFIG.sites
-              .filter((site) => site.category === categoryKey)
-              .forEach((site, index) => {
-                const item = document.createElement("div");
-                item.className = "col-item";
-                // 显示编号和网站名称
-                item.textContent = `${CONFIG.sites.indexOf(site) + 1}. ${site.name}`;
-                col.appendChild(item);
-              });
-
-            columns.appendChild(col);
-          });
-
-          console.appendChild(columns);
-        }
-
-        /**
-         * 绑定事件监听方法
-         * 设置各种用户交互事件的处理
-         */
-        bindEvents() {
-          // 主题切换事件
-          document
-            .getElementById("theme-select")
-            .addEventListener("change", (e) => {
-              this.switchTheme(e.target.value);
-            });
-
-          // 搜索功能事件
-          const searchInput = document.getElementById("searchInput");
-          const searchClear = document.getElementById("searchClear");
-
-          // 搜索输入事件
-          searchInput.addEventListener("input", (e) =>
-            this.handleSearch(e.target.value),
-          );
-          // 清除搜索事件
-          searchClear.addEventListener("click", () => this.clearSearch());
-
-          // 终端输入事件
-          document
-            .getElementById("terminalInput")
-            .addEventListener("keydown", (e) => {
-              if (e.key === "Enter") {
-                this.handleTerminalCommand(e.target.value.trim());
-                e.target.value = ""; // 清空输入框
-              }
-            });
-
-          // 返回顶部按钮事件
-          const scrollBtn = document.getElementById("scrollToTop");
-          // 监听滚动事件，控制按钮显示
-          window.addEventListener("scroll", () => {
-            scrollBtn.classList.toggle("show", window.pageYOffset > 300);
-          });
-          // 点击返回顶部
-          scrollBtn.addEventListener("click", () => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          });
-
-          // 快捷键事件
-          document.addEventListener("keydown", (e) => {
-            // Ctrl+K 聚焦搜索框
-            if (e.ctrlKey && e.key === "k") {
-              e.preventDefault();
-              searchInput.focus();
+                    section.appendChild(grid);
+                    container.appendChild(section);
+                });
             }
-            // ESC 清除搜索
-            if (e.key === "Escape") this.clearSearch();
-          });
-        }
 
-        /**
-         * 主题切换方法
-         * @param {string} theme - 主题名称
-         */
-        switchTheme(theme) {
-          this.currentTheme = theme;
-          this.applyTheme(theme);
-          // 保存到本地存储
-          localStorage.setItem("ultimate-nav-theme", theme);
-          // 显示切换通知
-          this.showNotification(`已切换到 ${this.getThemeName(theme)} 主题`);
-        }
+            /**
+             * 渲染终端内容方法
+             * 为Geek主题生成终端风格的网站列表
+             */
+            renderTerminal() {
+                const console = document.getElementById('console');
+                const columns = document.createElement('div');
+                columns.className = 'console-columns';
 
-        /**
-         * 应用主题方法
-         * @param {string} theme - 主题名称
-         */
-        applyTheme(theme) {
-          // 设置body的data-theme属性，触发CSS主题样式
-          document.body.setAttribute("data-theme", theme);
-          document.getElementById("theme-select").value = theme;
+                // 为每个分类创建一列
+                Object.keys(CONFIG.categories).forEach(categoryKey => {
+                    const col = document.createElement('div');
+                    col.className = 'console-col';
 
-          // Matrix主题特殊处理
-          if (theme === "matrix") {
-            this.matrix.start(); // 启动Matrix动画
-          } else {
-            this.matrix.stop(); // 停止Matrix动画
-          }
-        }
+                    // 分类标题
+                    const title = document.createElement('div');
+                    title.className = 'col-title';
+                    title.textContent = `【${categoryKey}】`;
+                    col.appendChild(title);
 
-        /**
-         * 获取主题中文名称方法
-         * @param {string} theme - 主题英文名
-         * @returns {string} 主题中文名
-         */
-        getThemeName(theme) {
-          const names = {
-            minimal: "简约",
-            geek: "极客",
-            cool: "炫酷",
-            matrix: "Matrix",
-            business: "商务",
-          };
-          return names[theme] || theme;
-        }
+                    // 分隔线
+                    const sep = document.createElement('div');
+                    sep.className = 'col-sep';
+                    col.appendChild(sep);
 
-        /**
-         * 搜索处理方法
-         * @param {string} query - 搜索关键词
-         */
-        handleSearch(query) {
-          const searchTerm = query.toLowerCase().trim();
-          // 控制清除按钮显示
-          document.getElementById("searchClear").style.display = searchTerm
-            ? "block"
-            : "none";
+                    // 网站列表项
+                    CONFIG.sites.filter(site => site.category === categoryKey).forEach((site, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'col-item';
+                        // 显示编号和网站名称
+                        item.textContent = `${CONFIG.sites.indexOf(site) + 1}. ${site.name}`;
+                        col.appendChild(item);
+                    });
 
-          let hasVisible = false; // 是否有可见结果
+                    columns.appendChild(col);
+                });
 
-          // 遍历所有分类
-          document.querySelectorAll(".category").forEach((category) => {
-            const cards = category.querySelectorAll(".link-card");
-            let categoryVisible = false; // 当前分类是否有可见卡片
+                console.appendChild(columns);
+            }
 
-            // 遍历分类下的所有卡片
-            cards.forEach((card) => {
-              const title = card.querySelector("h3").textContent.toLowerCase();
-              const desc = card.querySelector("p").textContent.toLowerCase();
-              const keywords = card.getAttribute("data-keywords") || "";
+            /**
+             * 绑定事件监听方法
+             * 设置各种用户交互事件的处理
+             */
+            bindEvents() {
+                // 主题切换事件
+                document.getElementById('theme-select').addEventListener('change', (e) => {
+                    this.switchTheme(e.target.value);
+                });
 
-              // 检查是否匹配搜索词
-              const visible =
-                !searchTerm ||
-                title.includes(searchTerm) ||
-                desc.includes(searchTerm) ||
-                keywords.toLowerCase().includes(searchTerm);
+                // 搜索功能事件
+                const searchInput = document.getElementById('searchInput');
+                const searchClear = document.getElementById('searchClear');
 
-              // 控制卡片显示/隐藏
-              card.classList.toggle("hidden", !visible);
-              if (visible) {
-                categoryVisible = true;
-                hasVisible = true;
-              }
-            });
+                // 搜索输入事件
+                searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+                // 清除搜索事件
+                searchClear.addEventListener('click', () => this.clearSearch());
 
-            // 控制分类显示/隐藏
-            category.classList.toggle("hidden", !categoryVisible);
-          });
+                // 终端输入事件
+                document.getElementById('terminalInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleTerminalCommand(e.target.value.trim());
+                        e.target.value = '';  // 清空输入框
+                    }
+                });
 
-          // 显示/隐藏无结果提示
-          this.toggleNoResults(!hasVisible && searchTerm);
-        }
+                // 返回顶部按钮事件
+                const scrollBtn = document.getElementById('scrollToTop');
+                // 监听滚动事件，控制按钮显示
+                window.addEventListener('scroll', () => {
+                    scrollBtn.classList.toggle('show', window.pageYOffset > 300);
+                });
+                // 点击返回顶部
+                scrollBtn.addEventListener('click', () => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
 
-        /**
-         * 清除搜索方法
-         */
-        clearSearch() {
-          document.getElementById("searchInput").value = "";
-          document.getElementById("searchClear").style.display = "none";
-          // 显示所有卡片和分类
-          document.querySelectorAll(".link-card, .category").forEach((el) => {
-            el.classList.remove("hidden");
-          });
-          this.toggleNoResults(false);
-        }
+                // 快捷键事件
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl+K 聚焦搜索框
+                    if (e.ctrlKey && e.key === 'k') {
+                        e.preventDefault();
+                        searchInput.focus();
+                    }
+                    // ESC 清除搜索
+                    if (e.key === 'Escape') this.clearSearch();
+                });
+            }
 
-        /**
-         * 切换无结果提示方法
-         * @param {boolean} show - 是否显示无结果提示
-         */
-        toggleNoResults(show) {
-          let noResults = document.getElementById("noResults");
-          if (show && !noResults) {
-            // 创建无结果提示元素
-            noResults = document.createElement("div");
-            noResults.id = "noResults";
-            noResults.innerHTML = `
+            /**
+             * 主题切换方法
+             * @param {string} theme - 主题名称
+             */
+            switchTheme(theme) {
+                this.currentTheme = theme;
+                this.applyTheme(theme);
+                // 保存到本地存储
+                localStorage.setItem('ultimate-nav-theme', theme);
+                // 显示切换通知
+                this.showNotification(`已切换到 ${this.getThemeName(theme)} 主题`);
+            }
+
+            /**
+             * 应用主题方法
+             * @param {string} theme - 主题名称
+             */
+            applyTheme(theme) {
+                // 设置body的data-theme属性，触发CSS主题样式
+                document.body.setAttribute('data-theme', theme);
+                document.getElementById('theme-select').value = theme;
+
+                // Matrix主题特殊处理
+                if (theme === 'matrix') {
+                    this.matrix.start();  // 启动Matrix动画
+                } else {
+                    this.matrix.stop();   // 停止Matrix动画
+                }
+            }
+
+            /**
+             * 获取主题中文名称方法
+             * @param {string} theme - 主题英文名
+             * @returns {string} 主题中文名
+             */
+            getThemeName(theme) {
+                const names = {
+                    minimal: '简约',
+                    geek: '极客',
+                    cool: '炫酷',
+                    matrix: 'Matrix',
+                    business: '商务'
+                };
+                return names[theme] || theme;
+            }
+
+            /**
+             * 搜索处理方法
+             * @param {string} query - 搜索关键词
+             */
+            handleSearch(query) {
+                const searchTerm = query.toLowerCase().trim();
+                // 控制清除按钮显示
+                document.getElementById('searchClear').style.display = searchTerm ? 'block' : 'none';
+
+                let hasVisible = false;  // 是否有可见结果
+
+                // 遍历所有分类
+                document.querySelectorAll('.category').forEach(category => {
+                    const cards = category.querySelectorAll('.link-card');
+                    let categoryVisible = false;  // 当前分类是否有可见卡片
+
+                    // 遍历分类下的所有卡片
+                    cards.forEach(card => {
+                        const title = card.querySelector('h3').textContent.toLowerCase();
+                        const desc = card.querySelector('p').textContent.toLowerCase();
+                        const keywords = card.getAttribute('data-keywords') || '';
+
+                        // 检查是否匹配搜索词
+                        const visible = !searchTerm ||
+                                      title.includes(searchTerm) ||
+                                      desc.includes(searchTerm) ||
+                                      keywords.toLowerCase().includes(searchTerm);
+
+                        // 控制卡片显示/隐藏
+                        card.classList.toggle('hidden', !visible);
+                        if (visible) {
+                            categoryVisible = true;
+                            hasVisible = true;
+                        }
+                    });
+
+                    // 控制分类显示/隐藏
+                    category.classList.toggle('hidden', !categoryVisible);
+                });
+
+                // 显示/隐藏无结果提示
+                this.toggleNoResults(!hasVisible && searchTerm);
+            }
+
+            /**
+             * 清除搜索方法
+             */
+            clearSearch() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('searchClear').style.display = 'none';
+                // 显示所有卡片和分类
+                document.querySelectorAll('.link-card, .category').forEach(el => {
+                    el.classList.remove('hidden');
+                });
+                this.toggleNoResults(false);
+            }
+
+            /**
+             * 切换无结果提示方法
+             * @param {boolean} show - 是否显示无结果提示
+             */
+            toggleNoResults(show) {
+                let noResults = document.getElementById('noResults');
+                if (show && !noResults) {
+                    // 创建无结果提示元素
+                    noResults = document.createElement('div');
+                    noResults.id = 'noResults';
+                    noResults.innerHTML = `
                         <div style="text-align:center;padding:60px 20px;opacity:0.6;">
                             <div style="font-size:3rem;margin-bottom:20px;">🔍</div>
                             <h3>未找到相关网站</h3>
                             <p>尝试使用其他关键词搜索</p>
                         </div>
                     `;
-            document.querySelector(".main .container").appendChild(noResults);
-          } else if (!show && noResults) {
-            // 移除无结果提示
-            noResults.remove();
-          }
+                    document.querySelector('.main .container').appendChild(noResults);
+                } else if (!show && noResults) {
+                    // 移除无结果提示
+                    noResults.remove();
+                }
+            }
+
+            /**
+             * 终端命令处理方法
+             * @param {string} command - 用户输入的命令
+             */
+            handleTerminalCommand(command) {
+                if (!command) return;
+
+                // 尝试解析为数字（网站编号）
+                const num = parseInt(command);
+                if (!isNaN(num) && num >= 1 && num <= CONFIG.sites.length) {
+                    // 根据编号打开对应网站
+                    window.open(CONFIG.sites[num - 1].url, '_blank');
+                    return;
+                }
+
+                // 关键词搜索
+                const filtered = CONFIG.sites.filter(site =>
+                    site.name.toLowerCase().includes(command.toLowerCase()) ||
+                    site.desc.toLowerCase().includes(command.toLowerCase())
+                );
+
+                if (filtered.length > 0) {
+                    console.log('找到匹配网站:', filtered.map(s => s.name).join(', '));
+                }
+            }
+
+            /**
+             * 显示通知方法
+             * @param {string} message - 通知消息
+             */
+            showNotification(message) {
+                // 创建通知元素
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                // 显示动画
+                setTimeout(() => notification.classList.add('show'), 10);
+
+                // 自动隐藏
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 2000);
+            }
         }
 
         /**
-         * 终端命令处理方法
-         * @param {string} command - 用户输入的命令
+         * 应用初始化
+         * 等待DOM加载完成后启动应用
          */
-        handleTerminalCommand(command) {
-          if (!command) return;
-
-          // 尝试解析为数字（网站编号）
-          const num = parseInt(command);
-          if (!isNaN(num) && num >= 1 && num <= CONFIG.sites.length) {
-            // 根据编号打开对应网站
-            window.open(CONFIG.sites[num - 1].url, "_blank");
-            return;
-          }
-
-          // 关键词搜索
-          const filtered = CONFIG.sites.filter(
-            (site) =>
-              site.name.toLowerCase().includes(command.toLowerCase()) ||
-              site.desc.toLowerCase().includes(command.toLowerCase()),
-          );
-
-          if (filtered.length > 0) {
-            console.log(
-              "找到匹配网站:",
-              filtered.map((s) => s.name).join(", "),
-            );
-          }
-        }
-
-        /**
-         * 显示通知方法
-         * @param {string} message - 通知消息
-         */
-        showNotification(message) {
-          // 创建通知元素
-          const notification = document.createElement("div");
-          notification.className = "notification";
-          notification.textContent = message;
-          document.body.appendChild(notification);
-
-          // 显示动画
-          setTimeout(() => notification.classList.add("show"), 10);
-
-          // 自动隐藏
-          setTimeout(() => {
-            notification.classList.remove("show");
-            setTimeout(() => notification.remove(), 300);
-          }, 2000);
-        }
-      }
-
-      /**
-       * 应用初始化
-       * 等待DOM加载完成后启动应用
-       */
-      document.addEventListener("DOMContentLoaded", () => {
-        new UltimateNavigator();
-      });
+        document.addEventListener('DOMContentLoaded', () => {
+            new UltimateNavigator();
+        });
     </script>
-  </body>
+</body>
+
 </html>
