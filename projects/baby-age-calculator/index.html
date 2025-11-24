@@ -1,201 +1,535 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>宝宝年龄计算器</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>宝宝年龄计算器 & 日历</title>
     <style>
-        :root {
-            --bg-color: #fdf0f5;
-            --primary-color: #f8c9d8;
-            --secondary-color: #ffffff;
-            --text-color: #5c5c5c;
-            --highlight-color: #e985a3;
-        }
+      :root {
+        --bg-color: #fdf0f5;
+        --primary-color: #f8c9d8;
+        --secondary-color: #ffffff;
+        --text-color: #5c5c5c;
+        --highlight-color: #e985a3;
+        --border-color: #fdeef2;
+      }
 
-        body {
-            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
-            background-color: var(--bg-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: var(--text-color);
-        }
+      body {
+        font-family: "Arial", "Microsoft YaHei", sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 20px;
+        color: var(--text-color);
+        display: flex;
+        justify-content: center; /* Center the main card */
+        align-items: center;
+        min-height: 100vh;
+      }
 
-        .calculator-container {
-            background-color: var(--secondary-color);
-            padding: 30px 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
+      .card {
+        background-color: var(--secondary-color);
+        padding: 20px 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        width: 90%;
+        max-width: 420px;
+      }
 
-        h1 {
-            color: var(--highlight-color);
-            font-size: 24px;
-            margin-bottom: 25px;
-        }
+      h1,
+      h2 {
+        color: var(--highlight-color);
+        margin-top: 0;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
 
-        .input-group {
-            margin-bottom: 25px;
-        }
+      .input-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
 
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
+      input[type="datetime-local"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid var(--primary-color);
+        border-radius: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+        cursor: pointer;
+        transition: border-color 0.3s;
+      }
+      input[type="datetime-local"]:focus {
+        outline: none;
+        border-color: var(--highlight-color);
+      }
 
-        input[type="date"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
-            font-size: 16px;
-            box-sizing: border-box;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
+      .result-container {
+        background-color: #fffafc;
+        border: 1px dashed var(--primary-color);
+        border-radius: 15px;
+        padding: 15px;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s;
+        opacity: 0;
+      }
+      .result-container.visible {
+        opacity: 1;
+      }
+      .result-text {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+      .result-text span {
+        font-weight: bold;
+        color: var(--highlight-color);
+        font-size: 22px;
+        margin: 0 4px;
+      }
+      .total-days {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #a0a0a0;
+      }
 
-        input[type="date"]:focus {
-            outline: none;
-            border-color: var(--highlight-color);
-        }
+      .action-button {
+        background: var(--highlight-color);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        width: 100%;
+        margin-top: 10px;
+      }
+      .action-button:hover {
+        background-color: #d66a8b;
+      }
 
-        .result-container {
-            background-color: #fffafc;
-            border: 1px dashed var(--primary-color);
-            border-radius: 15px;
-            padding: 20px;
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s;
-            opacity: 0;
+      /* --- Modal Styles --- */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        position: relative;
+        animation: fadeIn 0.3s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
         }
-        
-        .result-container.visible {
-            opacity: 1;
+        to {
+          opacity: 1;
+          transform: scale(1);
         }
+      }
 
-        .result-text {
-            font-size: 18px;
-            line-height: 1.6;
-        }
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .close-button:hover,
+      .close-button:focus {
+        color: #333;
+      }
 
-        .result-text span {
-            font-weight: bold;
-            color: var(--highlight-color);
-            font-size: 22px;
-            margin: 0 4px;
-        }
-        
-        .total-days {
-            margin-top: 15px;
-            font-size: 16px;
-            color: #a0a0a0;
-        }
+      /* --- Calendar Styles --- */
+      #calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      #calendar-header button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      #calendar-header button:hover {
+        background: var(--highlight-color);
+      }
+      #month-year {
+        font-size: 18px;
+        font-weight: bold;
+        color: var(--highlight-color);
+      }
+
+      #calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      #calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+      }
+      .day {
+        padding: 8px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+      .day:hover {
+        background-color: var(--border-color);
+      }
+      .day.other-month {
+        color: #ccc;
+        cursor: default;
+      }
+      .day.other-month:hover {
+        background-color: transparent;
+      }
+      .day.today {
+        background-color: var(--primary-color);
+        color: white;
+      }
+      .day.selected {
+        background-color: var(--highlight-color);
+        color: white;
+      }
+
+      #calendar-result {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 15px;
+        background-color: #f7f9ff;
+        border: 1px dashed #d6deff;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        line-height: 1.5;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="card">
+      <h1>💕 宝宝年龄计算器 💕</h1>
+      <div class="input-group">
+        <label for="birthdate">选择宝宝的出生日期和时间</label>
+        <input type="datetime-local" id="birthdate" />
+      </div>
+      <div class="result-container" id="result-container">
+        <p id="result-text" class="result-text"></p>
+        <p id="total-days-text" class="total-days"></p>
+      </div>
+      <button id="open-calendar-btn" class="action-button">
+        📅 打开日历查询
+      </button>
+    </div>
 
-    <div class="calculator-container">
-        <h1>💕 宝宝年龄计算器 💕</h1>
-        <div class="input-group">
-            <label for="birthdate">选择宝宝的出生日期</label>
-            <input type="date" id="birthdate">
+    <div id="calendar-modal" class="modal">
+      <div class="modal-content card">
+        <span class="close-button">&times;</span>
+        <h2>📅 日历查询 📅</h2>
+        <div id="calendar-header">
+          <button id="prev-month">‹</button>
+          <div id="month-year"></div>
+          <button id="next-month">›</button>
         </div>
-        <div class="result-container" id="result-container">
-            <p id="result-text" class="result-text"></p>
-            <p id="total-days-text" class="total-days"></p>
+        <div id="calendar-weekdays">
+          <div>日</div>
+          <div>一</div>
+          <div>二</div>
+          <div>三</div>
+          <div>四</div>
+          <div>五</div>
+          <div>六</div>
         </div>
+        <div id="calendar-days"></div>
+        <div id="calendar-result">请先选择生日，再点击日历查询</div>
+      </div>
     </div>
 
     <script>
-        const birthdateInput = document.getElementById('birthdate');
-        const resultContainer = document.getElementById('result-container');
-        const resultText = document.getElementById('result-text');
-        const totalDaysText = document.getElementById('total-days-text');
+      // --- DOM Elements ---
+      const birthdateInput = document.getElementById("birthdate");
+      const resultContainer = document.getElementById("result-container");
+      const resultText = document.getElementById("result-text");
+      const totalDaysText = document.getElementById("total-days-text");
 
-        let intervalId = null;
+      // Modal elements
+      const calendarModal = document.getElementById("calendar-modal");
+      const openCalendarBtn = document.getElementById("open-calendar-btn");
+      const closeBtn = document.querySelector(".close-button");
 
-        birthdateInput.addEventListener('change', () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-            if (birthdateInput.value) {
-                resultContainer.classList.add('visible');
-                calculateAndDisplay(); // 立即计算一次
-                intervalId = setInterval(calculateAndDisplay, 1000); // 每秒更新
-            } else {
-                resultContainer.classList.remove('visible');
-                resultText.innerHTML = '';
-                totalDaysText.innerHTML = '';
-            }
-        });
+      // Calendar elements
+      const prevMonthBtn = document.getElementById("prev-month");
+      const nextMonthBtn = document.getElementById("next-month");
+      const monthYearEl = document.getElementById("month-year");
+      const calendarDaysEl = document.getElementById("calendar-days");
+      const calendarResultEl = document.getElementById("calendar-result");
 
-        function calculateAndDisplay() {
-            const birthDate = new Date(birthdateInput.value);
-            const now = new Date();
+      // --- State ---
+      let realtimeIntervalId = null;
+      let calendarState = {
+        year: new Date().getFullYear(),
+        month: new Date().getMonth(), // 0-11
+        selectedDay: null,
+      };
 
-            if (isNaN(birthDate.getTime())) return;
-
-            // 1. 计算总天数
-            const totalDays = Math.floor((now - birthDate) / (1000 * 60 * 60 * 24));
-
-            // 2. 计算年、月、日
-            let years = now.getFullYear() - birthDate.getFullYear();
-            let months = now.getMonth() - birthDate.getMonth();
-            let days = now.getDate() - birthDate.getDate();
-
-            // 处理日、月为负数的情况（借位）
-            if (days < 0) {
-                months--;
-                // 获取上一个月的天数
-                const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-                days += lastMonth.getDate();
-            }
-
-            if (months < 0) {
-                years--;
-                months += 12;
-            }
-            
-            // 3. 计算时、分、秒
-            let hours = now.getHours() - birthDate.getHours();
-            let minutes = now.getMinutes() - birthDate.getMinutes();
-            let seconds = now.getSeconds() - birthDate.getSeconds();
-
-            if (seconds < 0) { minutes--; seconds += 60; }
-            if (minutes < 0) { hours--; minutes += 60; }
-            if (hours < 0) { days--; hours += 24; }
-
-
-            resultText.innerHTML = `小天使已经诞生<br>
-                <span>${years}</span>年 
-                <span>${months}</span>月 
-                <span>${days}</span>天 <br>
-                <span>${hours}</span>小时
-                <span>${minutes}</span>分钟
-                <span>${seconds}</span>秒
-            `;
-            totalDaysText.textContent = `(一共是 ${totalDays} 天)`;
+      // --- Core Calculation Logic ---
+      function calculateAge(startDate, endDate) {
+        if (
+          isNaN(startDate.getTime()) ||
+          isNaN(endDate.getTime()) ||
+          startDate > endDate
+        ) {
+          return null;
         }
-        
-        // 设置日期选择器的最大值为今天
+
+        // Calendar day count for "虚天"
+        const startOfEndDate = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+        );
+        const startOfStartDate = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate(),
+        );
+        const calendarDayCount =
+          Math.round(
+            (startOfEndDate - startOfStartDate) / (1000 * 60 * 60 * 24),
+          ) + 1;
+
+        // Precise age calculation
+        const totalDays = Math.floor(
+          (endDate - startDate) / (1000 * 60 * 60 * 24),
+        );
+        let years = endDate.getFullYear() - startDate.getFullYear();
+        let months = endDate.getMonth() - startDate.getMonth();
+        let days = endDate.getDate() - startDate.getDate();
+        let hours = endDate.getHours() - startDate.getHours();
+        let minutes = endDate.getMinutes() - startDate.getMinutes();
+        let seconds = endDate.getSeconds() - startDate.getSeconds();
+        if (seconds < 0) {
+          minutes--;
+          seconds += 60;
+        }
+        if (minutes < 0) {
+          hours--;
+          minutes += 60;
+        }
+        if (hours < 0) {
+          days--;
+          hours += 24;
+        }
+        if (days < 0) {
+          months--;
+          const lastMonth = new Date(
+            endDate.getFullYear(),
+            endDate.getMonth(),
+            0,
+          );
+          days += lastMonth.getDate();
+        }
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+        return {
+          years,
+          months,
+          days,
+          hours,
+          minutes,
+          seconds,
+          totalDays,
+          calendarDayCount,
+        };
+      }
+
+      // --- Real-time Calculator ---
+      function updateRealtimeDisplay() {
+        const birthDate = new Date(birthdateInput.value);
+        const age = calculateAge(birthDate, new Date());
+        if (!age) return;
+        resultText.innerHTML = `小天使已经诞生<br>
+                <span>${age.years}</span>年 <span>${age.months}</span>月 <span>${age.days}</span>天 <br>
+                <span>${age.hours}</span>小时 <span>${age.minutes}</span>分钟 <span>${age.seconds}</span>秒`;
+        totalDaysText.textContent = `(一共是 ${age.calendarDayCount} 虚天)`;
+      }
+
+      birthdateInput.addEventListener("change", () => {
+        // Save to localStorage whenever the date changes
+        localStorage.setItem("savedBirthDate", birthdateInput.value);
+
+        if (realtimeIntervalId) clearInterval(realtimeIntervalId);
+        if (birthdateInput.value) {
+          resultContainer.classList.add("visible");
+          updateRealtimeDisplay();
+          realtimeIntervalId = setInterval(updateRealtimeDisplay, 1000);
+          calendarResultEl.textContent = "请点击日历查询";
+          calendarState.selectedDay = null;
+          renderCalendar();
+        } else {
+          // Clear storage if the input is cleared
+          localStorage.removeItem("savedBirthDate");
+          resultContainer.classList.remove("visible");
+          resultText.innerHTML = "";
+          totalDaysText.innerHTML = "";
+        }
+      });
+
+      // --- Calendar Logic ---
+      function renderCalendar() {
+        const { year, month } = calendarState;
         const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-        const dd = String(today.getDate()).padStart(2, '0');
-        birthdateInput.max = `${yyyy}-${mm}-${dd}`;
+        monthYearEl.textContent = `${year}年 ${month + 1}月`;
+        calendarDaysEl.innerHTML = "";
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let i = 0; i < firstDayOfMonth; i++) {
+          calendarDaysEl.innerHTML += `<div class="day other-month"></div>`;
+        }
+        for (let i = 1; i <= daysInMonth; i++) {
+          const dayDate = new Date(year, month, i);
+          let classes = "day";
+          if (
+            year === today.getFullYear() &&
+            month === today.getMonth() &&
+            i === today.getDate()
+          ) {
+            classes += " today";
+          }
+          if (
+            calendarState.selectedDay &&
+            dayDate.toDateString() === calendarState.selectedDay.toDateString()
+          ) {
+            classes += " selected";
+          }
+          calendarDaysEl.innerHTML += `<div class="${classes}" data-date="${year}-${month + 1}-${i}">${i}</div>`;
+        }
+      }
 
+      prevMonthBtn.addEventListener("click", () => {
+        calendarState.month--;
+        if (calendarState.month < 0) {
+          calendarState.month = 11;
+          calendarState.year--;
+        }
+        renderCalendar();
+      });
+
+      nextMonthBtn.addEventListener("click", () => {
+        calendarState.month++;
+        if (calendarState.month > 11) {
+          calendarState.month = 0;
+          calendarState.year++;
+        }
+        renderCalendar();
+      });
+
+      calendarDaysEl.addEventListener("click", (e) => {
+        if (
+          !e.target.classList.contains("day") ||
+          e.target.classList.contains("other-month")
+        )
+          return;
+        const birthDate = new Date(birthdateInput.value);
+        if (isNaN(birthDate.getTime())) {
+          calendarResultEl.textContent =
+            "请先在上方选择一个有效的出生日期和时间！";
+          return;
+        }
+        const clickedDateStr = e.target.dataset.date;
+        const clickedDate = new Date(clickedDateStr);
+        const age = calculateAge(birthDate, clickedDate);
+        if (!age) {
+          calendarResultEl.textContent = "查询日期必须在出生日期之后哦！";
+          calendarState.selectedDay = null;
+        } else {
+          calendarResultEl.innerHTML = `<span>${age.years}</span>年 <span>${age.months}</span>月 <span>${age.days}</span>天 (共${age.calendarDayCount}虚天)`;
+          calendarState.selectedDay = clickedDate;
+        }
+        renderCalendar();
+      });
+
+      // --- Modal Control ---
+      openCalendarBtn.addEventListener("click", () => {
+        calendarModal.style.display = "flex";
+      });
+      closeBtn.addEventListener("click", () => {
+        calendarModal.style.display = "none";
+      });
+      window.addEventListener("click", (e) => {
+        if (e.target == calendarModal) {
+          calendarModal.style.display = "none";
+        }
+      });
+
+      // --- Initial Setup ---
+      function initialize() {
+        // Set max date for input
+        const nowForMax = new Date();
+        nowForMax.setMinutes(
+          nowForMax.getMinutes() - nowForMax.getTimezoneOffset(),
+        );
+        birthdateInput.max = nowForMax.toISOString().slice(0, 16);
+
+        // Render calendar
+        renderCalendar();
+
+        // Load saved birthdate from localStorage or set a default
+        const savedBirthDate = localStorage.getItem("savedBirthDate");
+        if (savedBirthDate) {
+          birthdateInput.value = savedBirthDate;
+        } else {
+          birthdateInput.value = "2025-08-08T18:03";
+        }
+
+        // Trigger calculation if there's a value
+        if (birthdateInput.value) {
+          birthdateInput.dispatchEvent(new Event("change"));
+        }
+      }
+
+      initialize();
     </script>
-
-</body>
+  </body>
 </html>
