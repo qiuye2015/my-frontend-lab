@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝宝年龄计算器</title>
+    <style>
+        :root {
+            --bg-color: #fdf0f5;
+            --primary-color: #f8c9d8;
+            --secondary-color: #ffffff;
+            --text-color: #5c5c5c;
+            --highlight-color: #e985a3;
+        }
+
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .calculator-container {
+            background-color: var(--secondary-color);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: var(--highlight-color);
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        input[type="date"]:focus {
+            outline: none;
+            border-color: var(--highlight-color);
+        }
+
+        .result-container {
+            background-color: #fffafc;
+            border: 1px dashed var(--primary-color);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s;
+            opacity: 0;
+        }
+        
+        .result-container.visible {
+            opacity: 1;
+        }
+
+        .result-text {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .result-text span {
+            font-weight: bold;
+            color: var(--highlight-color);
+            font-size: 22px;
+            margin: 0 4px;
+        }
+        
+        .total-days {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h1>💕 宝宝年龄计算器 💕</h1>
+        <div class="input-group">
+            <label for="birthdate">选择宝宝的出生日期</label>
+            <input type="date" id="birthdate">
+        </div>
+        <div class="result-container" id="result-container">
+            <p id="result-text" class="result-text"></p>
+            <p id="total-days-text" class="total-days"></p>
+        </div>
+    </div>
+
+    <script>
+        const birthdateInput = document.getElementById('birthdate');
+        const resultContainer = document.getElementById('result-container');
+        const resultText = document.getElementById('result-text');
+        const totalDaysText = document.getElementById('total-days-text');
+
+        let intervalId = null;
+
+        birthdateInput.addEventListener('change', () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+            if (birthdateInput.value) {
+                resultContainer.classList.add('visible');
+                calculateAndDisplay(); // 立即计算一次
+                intervalId = setInterval(calculateAndDisplay, 1000); // 每秒更新
+            } else {
+                resultContainer.classList.remove('visible');
+                resultText.innerHTML = '';
+                totalDaysText.innerHTML = '';
+            }
+        });
+
+        function calculateAndDisplay() {
+            const birthDate = new Date(birthdateInput.value);
+            const now = new Date();
+
+            if (isNaN(birthDate.getTime())) return;
+
+            // 1. 计算总天数
+            const totalDays = Math.floor((now - birthDate) / (1000 * 60 * 60 * 24));
+
+            // 2. 计算年、月、日
+            let years = now.getFullYear() - birthDate.getFullYear();
+            let months = now.getMonth() - birthDate.getMonth();
+            let days = now.getDate() - birthDate.getDate();
+
+            // 处理日、月为负数的情况（借位）
+            if (days < 0) {
+                months--;
+                // 获取上一个月的天数
+                const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            // 3. 计算时、分、秒
+            let hours = now.getHours() - birthDate.getHours();
+            let minutes = now.getMinutes() - birthDate.getMinutes();
+            let seconds = now.getSeconds() - birthDate.getSeconds();
+
+            if (seconds < 0) { minutes--; seconds += 60; }
+            if (minutes < 0) { hours--; minutes += 60; }
+            if (hours < 0) { days--; hours += 24; }
+
+
+            resultText.innerHTML = `小天使已经诞生<br>
+                <span>${years}</span>年 
+                <span>${months}</span>月 
+                <span>${days}</span>天 <br>
+                <span>${hours}</span>小时
+                <span>${minutes}</span>分钟
+                <span>${seconds}</span>秒
+            `;
+            totalDaysText.textContent = `(一共是 ${totalDays} 天)`;
+        }
+        
+        // 设置日期选择器的最大值为今天
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const dd = String(today.getDate()).padStart(2, '0');
+        birthdateInput.max = `${yyyy}-${mm}-${dd}`;
+
+    </script>
+
+</body>
+</html>
