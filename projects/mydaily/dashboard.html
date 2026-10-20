@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据统计中心 - MyDaily</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-container { max-width: 1200px; margin: 2rem auto; padding: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 2rem; }
+        .dashboard-header h1 { font-size: 1.8rem; color: var(--text-primary); }
+        .back-link { color: var(--primary-color); text-decoration: none; font-size: .95rem; }
+        .back-link:hover { text-decoration: underline; }
+        .module { margin-bottom: 2rem; padding: 1.5rem; background: var(--surface-secondary); border-radius: var(--radius-lg); }
+        .module h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 1.25rem; padding-bottom: .6rem; border-bottom: 2px solid rgba(79,70,229,.2); display: flex; align-items: center; gap: .5rem; }
+        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 1.25rem; border-radius: var(--radius-md); }
+        .stat-card h2 { font-size: 1.05rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-light); padding-bottom: .5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: .4rem; }
+        .chart-box { height: 260px; position: relative; }
+        .numeric { font-size: 2rem; font-weight: 600; color: var(--primary-color); text-align: center; padding: 1.5rem 0; }
+        .empty-hint { text-align: center; padding: 1.5rem; color: var(--text-light); font-size: .95rem; }
+        .habit-row { background: var(--surface-secondary); padding: .6rem .8rem; border-radius: var(--radius-sm); margin-bottom: .6rem; }
+        .habit-row strong { display: block; margin-bottom: .4rem; font-size: .95rem; }
+        .heatmap-days { display: flex; gap: 2px; flex-wrap: wrap; }
+        .heatmap-day { width: 15px; height: 15px; background: var(--border-light); border-radius: 2px; }
+        .heatmap-day.completed { background: var(--success); }
+        .habit-legend { font-size: .78rem; color: var(--text-light); margin-bottom: .3rem; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-brain"></i><span>MyDaily</span></div>
+            <a href="index.html" class="nav-link" aria-label="仪表盘"><i class="fas fa-tachometer-alt"></i><span>仪表盘</span></a>
+            <a href="dashboard.html" class="nav-link active" aria-label="数据统计"><i class="fas fa-chart-bar"></i><span>数据统计</span></a>
+            <a href="calendar.html" class="nav-link" aria-label="日历视图"><i class="fas fa-calendar-alt"></i><span>日历视图</span></a>
+            <div class="nav-actions">
+                <button class="focus-mode-btn" id="focusModeBtn" aria-label="专注模式"><i class="fas fa-eye"></i><span>专注模式</span></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-chart-line"></i> 数据统计中心</h1>
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回主页</a>
+        </div>
+
+        <div id="statsGridContainer">
+            <div class="module">
+                <h3><i class="fas fa-lightbulb"></i> 任务洞察</h3>
+                <div class="module-grid">
+                    <div class="stat-card">
+                        <h2><i class="fas fa-tasks"></i> 任务统计</h2>
+                        <div class="chart-box"><canvas id="taskCompletionChart"></canvas></div>
+                        <div class="chart-box" style="height:200px"><canvas id="taskPriorityChart"></canvas></div>
+                    </div>
+                    <div class="stat-card">
+                        <h2><i class="fas fa-tags"></i> 任务标签分析</h2>
+                        <div class="chart-box"><canvas id="taskTagsChart"></canvas></div>
+                    </div>
+                    <div class="stat-card">
+                        <h2><i class="fas fa-hourglass-end"></i> 平均任务耗时</h2>
+                        <div id="avgTaskCompletionTimeDisplay" class="numeric"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module">
+                <h3><i class="fas fa-bullseye"></i> 专注与效率</h3>
+                <div class="module-grid">
+                    <div class="stat-card">
+                        <h2><i class="fas fa-clock"></i> 番茄钟统计</h2>
+                        <div class="chart-box"><canvas id="pomodoroTrendChart"></canvas></div>
+                        <div id="pomodoroSummary"></div>
+                    </div>
+                    <div class="stat-card">
+                        <h2><i class="fas fa-hourglass-half"></i> 番茄钟时段分布</h2>
+                        <div class="chart-box"><canvas id="pomodoroDistributionChartHour"></canvas></div>
+                        <div class="chart-box"><canvas id="pomodoroDistributionChartDay"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module">
+                <h3><i class="fas fa-seedling"></i> 习惯养成</h3>
+                <div class="module-grid">
+                    <div class="stat-card">
+                        <h2><i class="fas fa-check-circle"></i> 习惯追踪</h2>
+                        <div id="habitCompletionHeatmap"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module">
+                <h3><i class="fas fa-book-open"></i> 思考与记录</h3>
+                <div class="module-grid">
+                    <div class="stat-card">
+                        <h2><i class="fas fa-sticky-note"></i> 笔记创建趋势</h2>
+                        <div class="chart-box"><canvas id="notesTrendChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" accept=".json" style="display:none">
+    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
+

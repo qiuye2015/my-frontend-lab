@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日历视图 - 个人管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: var(--background); color: var(--text-primary); min-height: 100vh; }
+        .calendar-container { flex: 1; padding: 2rem; max-width: 1200px; width: 90%; margin: 2rem auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); }
+        .fc .fc-button { border-radius: var(--radius-md); font-weight: 500; text-transform: capitalize; }
+        .evt-meta { display: flex; gap: .75rem; padding: .5rem 0; border-bottom: 1px solid var(--border-light); font-size: .9rem; }
+        .evt-meta span { color: var(--text-secondary); min-width: 3.5em; flex-shrink: 0; }
+        .evt-meta strong { color: var(--text-primary); font-weight: 500; word-break: break-word; }
+        :root {
+            --fc-border-color: var(--border); --fc-today-bg-color: rgba(79,70,229,.1);
+            --fc-event-bg-color: var(--primary-color); --fc-event-border-color: var(--primary-color);
+            --fc-event-text-color: #fff; --fc-button-bg-color: var(--primary-color);
+            --fc-button-border-color: var(--primary-color); --fc-button-hover-bg-color: var(--primary-dark);
+            --fc-button-hover-border-color: var(--primary-dark); --fc-button-active-bg-color: var(--primary-dark);
+            --fc-button-active-border-color: var(--primary-dark);
+        }
+        .fc .fc-toolbar-title { color: var(--text-primary); }
+        .fc .fc-daygrid-day-number, .fc .fc-col-header-cell-cushion { color: var(--text-secondary); }
+        .fc-event { cursor: pointer; font-size: .85em; padding: 3px 5px; }
+        .fc-event:hover { opacity: .85; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-brain"></i><span>MyDaily</span></div>
+            <a href="index.html" class="nav-link" aria-label="仪表盘"><i class="fas fa-tachometer-alt"></i><span>仪表盘</span></a>
+            <a href="dashboard.html" class="nav-link" aria-label="数据统计"><i class="fas fa-chart-bar"></i><span>数据统计</span></a>
+            <a href="calendar.html" class="nav-link active" aria-label="日历视图"><i class="fas fa-calendar-alt"></i><span>日历视图</span></a>
+            <div class="nav-actions">
+                <button class="focus-mode-btn" id="focusModeBtn" aria-label="专注模式"><i class="fas fa-eye"></i><span>专注模式</span></button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="calendar-container">
+        <div id="calendar"></div>
+    </main>
+
+    <input type="file" accept=".json" style="display:none">
+
+    <!-- 任务详情模态框 -->
+    <div class="modal" id="eventDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="evtTitle"></h3>
+                <button class="close-btn" data-modal="eventDetailModal" aria-label="关闭"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="evtBody"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/zh-cn.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+                initialView: 'dayGridMonth',
+                locale: 'zh-cn',
+                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
+                editable: true,
+                events: (info, success) => {
+                    const dailyData = JSON.parse(localStorage.getItem('dailyData')) || {};
+                    const events = [];
+                    for (const date in dailyData) {
+                        (dailyData[date].tasks || []).forEach(task => {
+                            if (!task.deadline) return;
+                            let bg = 'var(--primary-color)', text = '#fff';
+                            if (task.status === 'done') bg = 'var(--success)';
+                            else if (task.priority === 'high') bg = 'var(--error)';
+                            else if (task.priority === 'medium') { bg = 'var(--warning)'; text = 'var(--text-primary)'; }
+                            else if (task.priority === 'low') bg = 'var(--info)';
+                            const allDay = !task.startTime;
+                            events.push({
+                                id: String(task.id), title: task.title,
+                                start: allDay ? task.deadline : `${task.deadline}T${task.startTime}`,
+                                end: task.endTime ? `${task.deadline}T${task.endTime}` : null,
+                                allDay, backgroundColor: bg, borderColor: bg, textColor: text,
+                                extendedProps: { description: task.description, priority: task.priority, status: task.status }
+                            });
+                        });
+                    }
+                    success(events);
+                },
+                eventClick: info => {
+                    const p = info.event.extendedProps;
+                    const priLabel = { high: '高', medium: '中', low: '低' }[p.priority] || '—';
+                    const statusLabel = { todo: '待办', 'in-progress': '进行中', done: '已完成' }[p.status] || '—';
+                    document.getElementById('evtTitle').textContent = info.event.title;
+                    document.getElementById('evtBody').innerHTML = `
+                        <div class="evt-meta"><span>优先级</span><strong>${priLabel}</strong></div>
+                        <div class="evt-meta"><span>状态</span><strong>${statusLabel}</strong></div>
+                        <div class="evt-meta"><span>描述</span><strong>${esc(p.description || '无')}</strong></div>`;
+                    document.getElementById('eventDetailModal').classList.add('active');
+                },
+                eventDrop: info => {
+                    const start = info.event.start;
+                    if (!start) { info.revert(); return app?.notify('更新任务时间失败', 'error'); }
+                    const newDate = start.toISOString().split('T')[0];
+                    const newStart = (!info.event.allDay && start.toISOString().includes('T')) ? start.toISOString().split('T')[1].substring(0, 5) : null;
+                    if (app?.updateTaskDateTime) app.updateTaskDateTime(info.event.id, newDate, newStart, info.event.allDay);
+                    else info.revert();
+                }
+            });
+            calendar.render();
+            window.addEventListener('storage', e => { if (e.key === 'dailyData') calendar.refetchEvents(); });
+            if (window.app) app.calendar = calendar;
+        });
+    </script>
+</body>
+</html>
+
