@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MyDaily 个人管理系统 - 任务管理、习惯跟踪、番茄钟和笔记">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="manifest" href="manifest.json">
     <title>个人管理系统 - 减压优化版</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">跳转到主内容</a>
     <!-- 顶部导航栏 -->
     <nav class="main-nav">
         <div class="nav-container">
@@ -22,7 +27,7 @@
         </div>
     </nav>
 
-    <main class="main-content">
+    <main class="main-content" id="main-content">
         <!-- 侧边栏 -->
         <aside class="sidebar">
             <div class="sidebar-section time-progress-section">
@@ -45,9 +50,9 @@
                         <span class="timer-label" id="timerLabel"></span>
                     </div>
                     <div class="timer-controls">
-                        <button class="timer-btn play" id="playPauseBtn"><i class="fas fa-play"></i></button>
-                        <button class="timer-btn reset" id="resetBtn"><i class="fas fa-refresh"></i></button>
-                        <button class="timer-btn settings" id="timerSettingsBtn"><i class="fas fa-cog"></i></button>
+                        <button class="timer-btn play" id="playPauseBtn" aria-label="开始或暂停番茄钟"><i class="fas fa-play"></i></button>
+                        <button class="timer-btn reset" id="resetBtn" aria-label="重置番茄钟"><i class="fas fa-refresh"></i></button>
+                        <button class="timer-btn settings" id="timerSettingsBtn" aria-label="番茄钟设置"><i class="fas fa-cog"></i></button>
                     </div>
                     <div class="timer-progress">
                         <div class="progress-ring">
@@ -75,13 +80,16 @@
                 <div class="section-header">
                     <h2>任务管理</h2>
                     <div class="dashboard-controls">
+                        <label for="taskSearch" class="sr-only">搜索任务</label>
                         <input type="text" class="search-input" id="taskSearch" placeholder="搜索任务...">
+                        <label for="priorityFilter" class="sr-only">优先级筛选</label>
                         <select class="filter-select" id="priorityFilter">
                             <option value="">所有优先级</option>
                             <option value="high">高优先级</option>
                             <option value="medium">中优先级</option>
                             <option value="low">低优先级</option>
                         </select>
+                        <label for="statusFilter" class="sr-only">状态筛选</label>
                         <select class="filter-select" id="statusFilter">
                             <option value="">所有状态</option>
                             <option value="todo">待办</option>
@@ -90,6 +98,8 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="daily-task-stats"></div>
 
                 <div class="kanban-board">
                     <div class="kanban-column" data-status="todo">
@@ -111,7 +121,7 @@
 
             <section class="productivity-section">
                 <div class="tool-card habits-card">
-                    <div class="card-header"><h3>习惯跟踪</h3><button class="card-action-btn" id="addHabitBtn"><i class="fas fa-plus"></i></button></div>
+                    <div class="card-header"><h3>习惯跟踪</h3><button class="card-action-btn" id="addHabitBtn" aria-label="添加习惯"><i class="fas fa-plus"></i></button></div>
                     <div class="habits-grid" id="habitsGrid"></div>
                 </div>
 
@@ -127,6 +137,7 @@
 
                 <div class="tool-card notes-card">
                     <div class="card-header"><h3>快速笔记</h3><button class="card-action-btn" id="postNoteBtn" title="发布笔记"><i class="fas fa-paper-plane"></i></button></div>
+                    <label for="quickNotesInput" class="sr-only">快速笔记内容</label>
                     <textarea id="quickNotesInput" class="quick-notes-input" placeholder="记录你的想法和灵感，回车换行..."></textarea>
                     <div class="notes-status"><span></span><span class="char-count">0 字符</span></div>
                     <div id="noteStreamContainer" class="note-stream-container"></div>
@@ -140,7 +151,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>新建任务</h3>
-                <button class="close-btn" data-modal="addTaskModal"><i class="fas fa-times"></i></button>
+                <button class="close-btn" data-modal="addTaskModal" aria-label="关闭新建任务对话框"><i class="fas fa-times"></i></button>
             </div>
             <form class="task-form" id="taskForm">
                 <div class="form-group"><label for="taskTitle">任务标题</label><input type="text" id="taskTitle" class="form-input" required></div>
@@ -184,7 +195,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>番茄钟设置</h3>
-                <button class="close-btn" data-modal="timerSettingsModal"><i class="fas fa-times"></i></button>
+                <button class="close-btn" data-modal="timerSettingsModal" aria-label="关闭番茄钟设置对话框"><i class="fas fa-times"></i></button>
             </div>
             <form class="settings-form" id="timerSettingsForm">
                 <div class="form-group"><label for="workDuration">工作时长（分钟）</label><input type="number" id="workDuration" class="form-input" value="25" min="1" max="60"></div>
@@ -212,8 +223,14 @@
         </div>
     </div>
 
-    <input type="file" accept=".json" style="display:none">
+    <label for="importFileInput" class="sr-only">导入数据文件</label>
+    <input type="file" id="importFileInput" accept=".json" style="display:none" aria-label="导入数据文件">
+    <div id="notificationRegion" aria-live="polite" aria-atomic="true" class="sr-only"></div>
     <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
+    </script>
 </body>
 </html>
-

@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MyDaily 日历视图 - 以日历形式查看和管理任务">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="manifest" href="manifest.json">
     <title>日历视图 - 个人管理系统</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -46,7 +50,8 @@
         <div id="calendar"></div>
     </main>
 
-    <input type="file" accept=".json" style="display:none">
+    <label for="importFileInput" class="sr-only">导入数据文件</label>
+    <input type="file" id="importFileInput" accept=".json" style="display:none" aria-label="导入数据文件">
 
     <!-- 任务详情模态框 -->
     <div class="modal" id="eventDetailModal">
@@ -62,60 +67,9 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/zh-cn.js"></script>
     <script src="app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                initialView: 'dayGridMonth',
-                locale: 'zh-cn',
-                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
-                editable: true,
-                events: (info, success) => {
-                    const dailyData = JSON.parse(localStorage.getItem('dailyData')) || {};
-                    const events = [];
-                    for (const date in dailyData) {
-                        (dailyData[date].tasks || []).forEach(task => {
-                            if (!task.deadline) return;
-                            let bg = 'var(--primary-color)', text = '#fff';
-                            if (task.status === 'done') bg = 'var(--success)';
-                            else if (task.priority === 'high') bg = 'var(--error)';
-                            else if (task.priority === 'medium') { bg = 'var(--warning)'; text = 'var(--text-primary)'; }
-                            else if (task.priority === 'low') bg = 'var(--info)';
-                            const allDay = !task.startTime;
-                            events.push({
-                                id: String(task.id), title: task.title,
-                                start: allDay ? task.deadline : `${task.deadline}T${task.startTime}`,
-                                end: task.endTime ? `${task.deadline}T${task.endTime}` : null,
-                                allDay, backgroundColor: bg, borderColor: bg, textColor: text,
-                                extendedProps: { description: task.description, priority: task.priority, status: task.status }
-                            });
-                        });
-                    }
-                    success(events);
-                },
-                eventClick: info => {
-                    const p = info.event.extendedProps;
-                    const priLabel = { high: '高', medium: '中', low: '低' }[p.priority] || '—';
-                    const statusLabel = { todo: '待办', 'in-progress': '进行中', done: '已完成' }[p.status] || '—';
-                    document.getElementById('evtTitle').textContent = info.event.title;
-                    document.getElementById('evtBody').innerHTML = `
-                        <div class="evt-meta"><span>优先级</span><strong>${priLabel}</strong></div>
-                        <div class="evt-meta"><span>状态</span><strong>${statusLabel}</strong></div>
-                        <div class="evt-meta"><span>描述</span><strong>${esc(p.description || '无')}</strong></div>`;
-                    document.getElementById('eventDetailModal').classList.add('active');
-                },
-                eventDrop: info => {
-                    const start = info.event.start;
-                    if (!start) { info.revert(); return app?.notify('更新任务时间失败', 'error'); }
-                    const newDate = start.toISOString().split('T')[0];
-                    const newStart = (!info.event.allDay && start.toISOString().includes('T')) ? start.toISOString().split('T')[1].substring(0, 5) : null;
-                    if (app?.updateTaskDateTime) app.updateTaskDateTime(info.event.id, newDate, newStart, info.event.allDay);
-                    else info.revert();
-                }
-            });
-            calendar.render();
-            window.addEventListener('storage', e => { if (e.key === 'dailyData') calendar.refetchEvents(); });
-            if (window.app) app.calendar = calendar;
-        });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>
-
