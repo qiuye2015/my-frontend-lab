@@ -543,8 +543,32 @@ class App {
     renderTimeProgress() {
         const el = $('timeProgress'); if (!el) return;
         const now = new Date();
-        const pct = (start, end) => (now - start) / (end - start) * 100;
+        const pct = (start, end) => Math.max(0, Math.min(100, (now - start) / (end - start) * 100));
         const daysLeft = end => Math.ceil((end - now) / DAY);
+        const clamp01 = v => Math.max(0, Math.min(1, v));
+
+        // 公历日期头部
+        const weekNames = ['日', '一', '二', '三', '四', '五', '六'];
+        const solarHeader = `
+            <div class="tp-date-header">
+                <div class="tp-date-solar">${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${weekNames[now.getDay()]}</div>
+            </div>`;
+
+        // 农历信息
+        let lunarHtml = '';
+        if (typeof Solar !== 'undefined') {
+            try {
+                const solar = Solar.fromDate(now);
+                const lunar = solar.getLunar();
+                const ganZhi = lunar.getYearInGanZhi();
+                const shengXiao = lunar.getYearShengXiao();
+                const monthCn = lunar.getMonthInChinese();
+                const dayCn = lunar.getDayInChinese();
+                lunarHtml = `<div class="tp-date-lunar">农历${monthCn}月${dayCn} · ${ganZhi}${shengXiao}年</div>`;
+            } catch(e) { /* 库加载失败时静默降级 */ }
+        }
+
+        // 公历年 + 季度进度条
         const yStart = new Date(now.getFullYear(), 0, 1), yEnd = new Date(now.getFullYear() + 1, 0, 1);
         const q = Math.floor(now.getMonth() / 3);
         const qStart = new Date(now.getFullYear(), q * 3, 1), qEnd = new Date(now.getFullYear(), q * 3 + 3, 1);
@@ -555,7 +579,46 @@ class App {
                 <span class="tp-pct">${Math.floor(p)}%</span>
                 <span class="tp-left">剩 ${daysLeft(end)} 天</span>
             </div>`;
-        el.innerHTML = row(`${now.getFullYear()} 年`, pct(yStart, yEnd), yEnd) + row(`Q${q + 1} 季度`, pct(qStart, qEnd), qEnd);
+        let html = solarHeader + lunarHtml;
+        html += row(`${now.getFullYear()} 年`, pct(yStart, yEnd), yEnd);
+        html += row(`Q${q + 1} 季度`, pct(qStart, qEnd), qEnd);
+
+        // 农历进度 + 春节倒计时
+        if (typeof Lunar !== 'undefined') {
+            try {
+                const todayLunar = Solar.fromDate(now).getLunar();
+
+                const curYearFestival = Lunar.fromYmd(todayLunar.getYear(), 1, 1).getSolar();
+                const curFestivalDate = new Date(curYearFestival.getYear(), curYearFestival.getMonth() - 1, curYearFestival.getDay());
+                const nextLunarYear = todayLunar.getYear() + 1;
+                const nextYearFestival = Lunar.fromYmd(nextLunarYear, 1, 1).getSolar();
+                const nextFestivalDate = new Date(nextYearFestival.getYear(), nextYearFestival.getMonth() - 1, nextYearFestival.getDay());
+
+                let lunarStart, lunarEnd, springFestivalDate;
+                if (now < curFestivalDate) {
+                    const prevYearFestival = Lunar.fromYmd(todayLunar.getYear() - 1, 1, 1).getSolar();
+                    lunarStart = new Date(prevYearFestival.getYear(), prevYearFestival.getMonth() - 1, prevYearFestival.getDay());
+                    lunarEnd = curFestivalDate;
+                    springFestivalDate = curFestivalDate;
+                } else {
+                    lunarStart = curFestivalDate;
+                    lunarEnd = nextFestivalDate;
+                    springFestivalDate = nextFestivalDate;
+                }
+
+                const daysToSpring = daysLeft(springFestivalDate);
+                const springPct = clamp01((now - lunarStart) / (springFestivalDate - lunarStart)) * 100;
+                html += `
+                    <div class="time-progress-row">
+                        <span class="tp-label">春节</span>
+                        <div class="tp-bar"><div style="width:${springPct.toFixed(1)}%"></div></div>
+                        <span class="tp-pct">${Math.floor(springPct)}%</span>
+                        <span class="tp-left">${daysToSpring > 0 ? '剩 ' + daysToSpring + ' 天' : '今天!'}</span>
+                    </div>`;
+            } catch(e) { /* 计算异常时静默降级 */ }
+        }
+
+        el.innerHTML = html;
     }
 
     // ---------- 专注模式 ----------
@@ -1128,4 +1191,3 @@ class App {
 // 脚本在 body 底部，DOM 已就绪：立即构造，消除计时器恢复前的静态闪烁
 let app = new App();
 window.app = app;
-

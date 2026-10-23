@@ -80,6 +80,9 @@ i { font-style: normal; }
 .streak-fire { font-size: 1.2rem; }
 
 /* 时间进度 */
+.tp-date-header { margin-bottom: var(--spacing-sm); }
+.tp-date-solar { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary); }
+.tp-date-lunar { font-size: var(--font-size-xs); color: var(--text-light); margin-bottom: var(--spacing-md); }
 .time-progress-row { display: flex; align-items: center; gap: var(--spacing-sm); font-size: var(--font-size-xs); margin-bottom: var(--spacing-sm); }
 .time-progress-row:last-child { margin-bottom: 0; }
 .tp-label { color: var(--text-secondary); flex-shrink: 0; white-space: nowrap; }
